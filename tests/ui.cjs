@@ -57,6 +57,7 @@ async function mount(failFirst = false) {
       'journey.js',
       'chart-stats.js',
       'chart-lab.js',
+      'family-guide.js',
       'app.js',
     ]
       .map((file) => fs.readFileSync(root + '/' + file, 'utf8'))
@@ -92,6 +93,34 @@ function contrast(a, b) {
   assert.equal(UI.tabDestination('Tab', 0), undefined);
   const { dom, w, $, errors } = await mount();
   assert.equal($('load-error').hidden, true, $('load-error-message').textContent);
+  assert.equal($('family-town').hidden, false);
+  for (const town of ['FUNZA', 'MOSQUERA']) {
+    $('family-town-search').value = town;
+    $('family-town-search').dispatchEvent(new w.Event('input'));
+    $('family-town-options').querySelector('button').click();
+  }
+  assert.equal($('family-chosen-towns').querySelectorAll('.chip').length, 2);
+  assert.equal($('family-town-search').value, '');
+  $('family-town-next').click();
+  assert.equal($('family-school').hidden, false);
+  assert.match($('family-location').textContent, /FUNZA/);
+  assert.match($('family-location').textContent, /MOSQUERA/);
+  $('family-school-search').value = 'colegio';
+  $('family-school-search').dispatchEvent(new w.Event('input'));
+  const candidate = $('family-school-options').querySelector('button');
+  assert.ok(candidate);
+  candidate.click();
+  assert.equal($('family-compare').hidden, false);
+  assert.equal($('main').hidden, false);
+  assert.match($('family-result').textContent, /promedio|puntos/);
+  const familyState = JSON.parse(decodeURIComponent(w.location.hash.slice(1)));
+  assert.equal(familyState.places.length, 2);
+  assert.ok(familyState.selected.length >= 1 && familyState.selected.length <= 2);
+  assert.equal(familyState.chartOptions.panel, 'annual');
+  assert.equal($('mean-chart').closest('[data-comparison-panel]').hidden, false);
+  $('family-advanced').click();
+  $('journey-reset').click();
+
   assert.equal($('step-departments').hidden, false);
   // Add municipalities one at a time without losing earlier choices.
   $('clear-places').click();
@@ -365,6 +394,7 @@ function contrast(a, b) {
     passed: true,
     domChecks: [
       'initial load',
+      'family path: two municipalities, candidate search and automatic leader comparison',
       'general annual chart invariant under metric and weight changes',
       'chart point selection, year control and invalid endpoint interval',
       'weight scenario exploration and application',

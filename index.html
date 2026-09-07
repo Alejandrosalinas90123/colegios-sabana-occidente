@@ -9,7 +9,7 @@
       content="Compara resultados históricos Saber 11 de colegios: municipios de Colombia, materias, estudiantes y escenarios de pesos."
     />
     <title>Atlas de colegios · Saber 11</title>
-    <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles.css?v=8" />
   </head>
   <body>
     <a class="skip" href="#main">Ir a los resultados</a>
@@ -25,10 +25,10 @@
     </header>
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <h1 id="page-title">Una búsqueda a tu medida, paso a paso</h1>
+        <h1 id="page-title">Encuentra y compara colegios</h1>
         <p>
-          Define dónde buscar, qué materias valorar y qué colegios comparar. Datos verificados de
-          2021 a 2025.
+          Consulta los resultados Saber 11 de tu municipio y compáralos con el colegio que tienes en
+          mente.
         </p>
       </div>
     </section>
@@ -43,6 +43,66 @@
       <button id="retry" class="primary">Reintentar carga</button>
     </div>
     <div id="app" class="journey-layout" hidden="">
+      <button id="family-start" hidden>Buscar un colegio en 3 pasos</button>
+      <section id="family-guide" class="journey-panel" aria-labelledby="family-title" hidden>
+        <p id="family-position" class="eyebrow"></p>
+        <h2 id="family-title" tabindex="-1"></h2>
+        <p id="family-location"></p>
+        <div id="family-town">
+          <label for="family-town-search">Busca y añade municipios</label
+          ><input
+            id="family-town-search"
+            type="search"
+            placeholder="Por ejemplo: Mosquera"
+            aria-describedby="family-town-help"
+          />
+          <p id="family-town-help" role="status"></p>
+          <div id="family-town-options" class="family-options"></div>
+          <p>Puedes añadir varios, uno por uno.</p>
+          <div id="family-chosen-towns" class="selection"></div>
+          <button id="family-town-next" class="primary" disabled>Continuar</button>
+        </div>
+        <div id="family-school" hidden>
+          <button data-family-back="town">← Cambiar municipios</button>
+          <div id="family-leader" class="card"></div>
+          <label for="family-school-search">Nombre del colegio que estás considerando</label
+          ><input
+            id="family-school-search"
+            type="search"
+            placeholder="Escribe parte del nombre"
+            aria-describedby="family-school-help"
+          />
+          <p id="family-school-help" role="status"></p>
+          <div id="family-school-options" class="family-options"></div>
+          <details>
+            <summary>No encuentro mi colegio</summary>
+            <p>Prueba una palabra del nombre. También puede faltar algún año en la base.</p>
+            <label class="check"
+              ><input id="family-incomplete" type="checkbox" /><span
+                >Incluir colegios con años incompletos</span
+              ></label
+            >
+          </details>
+        </div>
+        <div id="family-compare" hidden>
+          <div id="family-result"></div>
+          <button data-family-back="school">← Elegir otro colegio</button
+          ><button data-family-back="town">Cambiar municipios</button>
+        </div>
+        <details>
+          <summary>Qué significa esta comparación</summary>
+          <p id="family-criteria"></p>
+          <p>
+            Mayor promedio Saber 11 no significa mejor colegio en todos los aspectos. Esta base no
+            contiene pensiones, matrícula, convivencia ni acompañamiento. Confirma estos aspectos y
+            el costo con el colegio antes de decidir.
+          </p>
+        </details>
+        <button id="family-advanced" class="text-button">
+          Abrir búsqueda avanzada: varios municipios y pesos por materia
+        </button>
+      </section>
+
       <div class="journey-shell">
         <div class="route-head">
           <h2>¿Qué quieres hacer?</h2>
@@ -814,7 +874,7 @@
       <div id="school-detail"></div>
     </dialog>
     <script src="engine.js?v=4"></script>
-    <script src="state.js?v=7"></script>
+    <script src="state.js?v=8"></script>
     <script src="data-loader.js?v=3"></script>
     <script src="ui.js?v=7"></script>
     <script src="subject-guide.js?v=4"></script>
@@ -822,6 +882,7 @@
     <script src="journey.js?v=7"></script>
     <script src="chart-stats.js?v=7"></script>
     <script src="chart-lab.js?v=7"></script>
-    <script src="app.js?v=7"></script>
+    <script src="family-guide.js?v=8"></script>
+    <script src="app.js?v=8"></script>
   </body>
 </html>

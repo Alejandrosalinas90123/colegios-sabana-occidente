@@ -141,6 +141,8 @@ const DashboardState = (() => {
         highlight: out.selected.includes(chart.highlight) ? chart.highlight : null,
       };
     }
+    if ('family' in o)
+      out.family = ['town', 'school', 'compare'].includes(o.family) ? o.family : null;
     return out;
   }
   return { defaults, encode, decode };

@@ -1281,3 +1281,33 @@ line.chart-series.muted {
     fill: CanvasText;
   }
 }
+
+.family-options {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+}
+.family-options button {
+  text-align: left;
+  padding: 16px;
+}
+.family-options button span {
+  display: block;
+  font-weight: 400;
+}
+#family-guide {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
+}
+#family-guide label:not(.check) {
+  display: block;
+  font-weight: 650;
+  margin: 16px 0 8px;
+}
+#family-guide input[type='search'] {
+  width: 100%;
+}
+#family-guide details {
+  margin: 24px 0;
+}

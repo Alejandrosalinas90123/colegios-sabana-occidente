@@ -142,6 +142,7 @@ function change(patch, { controls = false } = {}) {
 function render() {
   const focus = DashboardUI.captureFocus();
   result = SchoolEngine.calculate(data, state, state.weights, state.reference);
+  FamilyGuide.alignReference();
   filtered = result.rows.filter((r) => norm(r.name).includes(norm(state.search)));
   const ps = new Set(state.places),
     ys = new Set(state.years),
@@ -188,6 +189,7 @@ function render() {
   );
   SchoolJourney.refresh();
   ChartLab.render();
+  FamilyGuide.refresh();
   DashboardUI.labelTables();
   save();
   DashboardUI.restoreFocus(focus);
@@ -628,6 +630,7 @@ async function start() {
     bind();
     SchoolJourney.initialize(Boolean(location.hash && location.hash !== '#main'));
     ChartLab.initialize();
+    FamilyGuide.initialize();
     syncControls();
     $('app').hidden = false;
     $('share').disabled = false;

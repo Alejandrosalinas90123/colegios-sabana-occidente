@@ -97,3 +97,12 @@ Los identificadores dependen de la versión 2 de la base, que permanece fija en 
 - Pruebas de dominios, extremos cero/cien, invariancia numérica, una vista visible y coordenadas SVG en un ancho simulado de 360 píxeles. La simulación DOM no reemplaza una auditoría en dispositivos reales.
 
 Referencias de presentación: [Datawrapper: gráficos de líneas](https://academy.datawrapper.de/article/129-what-to-consider-when-creating-line-charts) y [NN/g: información progresiva](https://www.nngroup.com/articles/progressive-disclosure/).
+
+
+## Recorrido directo para familias (v8)
+
+La entrada inicial permite añadir municipios por nombre, elegir un colegio y compararlo automáticamente con el de mayor promedio entre todos los municipios elegidos. Cada municipio se confirma con su departamento para distinguir nombres repetidos. La referencia usa los mismos filtros y el mismo motor del tablero; no es el primero de cada municipio por separado.
+
+El recorrido comienza con 2021–2025, materias y años con igual peso, jornadas diurnas y registros en todos los años. Se pueden permitir historias incompletas con una advertencia sobre comparabilidad. La elección del colegio puede ser cualquiera de los elegibles, no solo un finalista predefinido. Empates y selección del propio líder se explican. No se infieren costos ni calidad integral a partir de Saber 11.
+
+`family-guide.js` compone este recorrido y conserva el acceso avanzado. La búsqueda al escribir filtra catálogos locales; no vuelve a descargar datos ni recalcula el ranking por cada tecla. Prueba de interacción: añadir Funza y Mosquera, elegir un colegio, generar la comparación, conservar ambos municipios y volver a la búsqueda avanzada.
