@@ -9,7 +9,7 @@
       content="Compara resultados históricos Saber 11 de colegios: municipios de Colombia, materias, estudiantes y escenarios de pesos."
     />
     <title>Atlas de colegios · Saber 11</title>
-    <link rel="stylesheet" href="styles.css?v=5" />
+    <link rel="stylesheet" href="styles.css?v=7" />
   </head>
   <body>
     <a class="skip" href="#main">Ir a los resultados</a>
@@ -59,18 +59,25 @@
         </div>
         <nav id="journey-nav" aria-label="Pasos de la búsqueda"></nav>
         <section class="selection-summary" aria-labelledby="summary-heading">
-          <div class="between">
-            <h2 id="summary-heading">Esto está incluido en tu búsqueda</h2>
-            <button data-goto="places">Editar municipios</button>
-          </div>
-          <p id="journey-summary"></p>
-          <details id="chosen-places-details" open>
-            <summary id="chosen-places-title">Ver municipios seleccionados</summary>
-            <label for="chosen-place-search">Buscar entre los seleccionados</label
-            ><input id="chosen-place-search" type="search" placeholder="Municipio o departamento" />
-            <div id="chosen-places"></div>
+          <details>
+            <summary>Revisar o editar mi selección</summary>
+            <div class="between">
+              <h2 id="summary-heading">Esto está incluido en tu búsqueda</h2>
+              <button data-goto="places">Editar municipios</button>
+            </div>
+            <p id="journey-summary"></p>
+            <details id="chosen-places-details">
+              <summary id="chosen-places-title">Ver municipios seleccionados</summary>
+              <label for="chosen-place-search">Buscar entre los seleccionados</label
+              ><input
+                id="chosen-place-search"
+                type="search"
+                placeholder="Municipio o departamento"
+              />
+              <div id="chosen-places"></div>
+            </details>
+            <div id="chosen-schools"></div>
           </details>
-          <div id="chosen-schools"></div>
         </section>
         <button id="reset" class="text-button" hidden="">Restablecer</button>
       </div>
@@ -92,12 +99,15 @@
           <span id="department-count"></span
           ><button id="all-departments">Seleccionar todos los departamentos</button>
         </div>
-        <div
-          id="departments-list"
-          class="department-grid"
-          role="group"
-          aria-label="Departamentos"
-        ></div>
+        <details id="department-options">
+          <summary>Explorar departamentos</summary>
+          <div
+            id="departments-list"
+            class="department-grid"
+            role="group"
+            aria-label="Departamentos"
+          ></div>
+        </details>
         <p id="departments-error" class="field-error" hidden=""></p>
       </section>
       <section id="step-places" class="journey-panel" aria-labelledby="heading-places" hidden="">
@@ -121,9 +131,8 @@
             aria-describedby="place-search-help"
           />
           <p id="place-search-help" class="hint">
-            Busca un municipio, marca su casilla y pulsa «Buscar otro municipio». Repite para añadir
-            todos los que quieras: los anteriores se conservan. No necesitas escribir nombres
-            separados por comas.
+            Busca un municipio y marca su casilla. Después busca el siguiente: los anteriores se
+            conservan.
           </p>
           <button id="next-place-search">Buscar otro municipio</button>
           <div class="between">
@@ -137,7 +146,15 @@
             </button>
           </details>
           <p><strong>Municipios que ya añadiste</strong></p>
-          <div id="place-selection-inline" class="selection"></div>
+          <details id="inline-places-details" open="">
+            <summary>Ver municipios añadidos</summary>
+            <div id="place-selection-inline" class="selection"></div>
+          </details>
+          <label class="check"
+            ><input id="browse-places" type="checkbox" /><span
+              >Explorar la lista completa de municipios</span
+            ></label
+          >
           <div
             id="places"
             class="place-list"
@@ -166,7 +183,7 @@
             elegidos</label
           >
         </details>
-        <details class="filter-section" open="">
+        <details class="filter-section">
           <summary>03 / Afinar los resultados</summary>
           <label for="nature">Sector</label>
           <select id="nature">
@@ -267,11 +284,15 @@
         <button id="next-school-search">Buscar otro colegio</button>
         <div id="picker-selected" class="selection"></div>
         <p id="picker-count" role="status"></p>
-        <div id="school-picker" class="school-picker"></div>
-        <div class="pagination">
-          <button id="picker-prev">Anterior</button><span id="picker-page"></span
-          ><button id="picker-next">Siguiente</button>
-        </div>
+        <details id="school-options">
+          <summary>Explorar colegios disponibles</summary>
+          <div id="school-picker" class="school-picker"></div>
+          <div class="pagination">
+            <button id="picker-prev">Anterior</button><span id="picker-page"></span
+            ><button id="picker-next">Siguiente</button>
+          </div>
+        </details>
+
         <p id="schools-error" class="field-error" hidden=""></p>
       </section>
       <main id="main" tabindex="-1" class="journey-results" data-journey-panel="results" hidden="">
@@ -282,7 +303,10 @@
             ><button data-goto="places">Cambiar territorios y años</button
             ><button id="choose-more-schools" class="primary">Elegir colegios para comparar</button>
           </div>
-          <div id="results-indicator" class="card"></div>
+          <details>
+            <summary>Cómo se calculó mi indicador</summary>
+            <div id="results-indicator" class="card"></div>
+          </details>
         </div>
         <div class="tabs" role="tablist" aria-label="Vistas del tablero">
           <button
@@ -304,8 +328,12 @@
             Comparar seleccionados <span id="selection-count">0</span>
           </button>
         </div>
-        <div id="scope" class="scope"></div>
-        <div id="stats" class="stats"></div>
+        <details>
+          <summary>Resumen de filtros y cifras</summary>
+          <div id="scope" class="scope"></div>
+          <div id="stats" class="stats"></div>
+        </details>
+
         <div id="selection" class="selection" hidden=""></div>
         <section id="explore-view" role="tabpanel" aria-labelledby="explore-tab" tabindex="0">
           <div class="section-title">
@@ -407,65 +435,43 @@
             de evaluados.
           </p>
           <section id="chart-lab" class="chart-lab">
-            <div class="section-title">
-              <div>
-                <span class="eyebrow">LABORATORIO DE COMPARACIONES</span>
-                <h2>Una mirada distinta a los mismos colegios</h2>
-              </div>
-            </div>
-            <nav class="presets" aria-label="Gráficas comparativas">
-              <button data-chart-goto="annual-mean-title">Promedio anual</button
-              ><button data-chart-goto="chart-change-title">Cambio entre años</button
-              ><button data-chart-goto="chart-scatter-title">Puntaje y evaluados</button
-              ><button data-chart-goto="chart-sensitivity-title">Sensibilidad a pesos</button>
-            </nav>
-            <div id="chart-quality" class="card"></div>
-            <p id="chart-empty" class="empty" hidden="">
-              Elige colegios con resultados que cumplan tus filtros. Los colegios excluidos siguen
-              visibles en el resumen de selección.
-            </p>
-            <div id="chart-panels">
-              <section class="card" aria-labelledby="annual-mean-title">
-                <h3 id="annual-mean-title" tabindex="-1">Promedio general por colegio y año</h3>
-                <p>
-                  Promedio simple de las cinco materias, de 0 a 100. Esta gráfica permanece
-                  independiente de tus pesos y de la materia que explores abajo. No es el puntaje
-                  global oficial del ICFES. Dentro de cada año, las jornadas elegidas se combinan
-                  ponderando por evaluados antes de promediar las cinco materias.
-                </p>
+            <div class="card comparison-tools">
+              <label for="comparison-question">¿Qué quieres comparar?</label
+              ><select id="comparison-question">
+                <option value="annual">Promedio general por año</option>
+                <option value="change">Cambio entre dos años</option>
+                <option value="scatter">Puntaje y número de evaluados</option>
+                <option value="sensitivity">Posición según mis prioridades</option>
+                <option value="trend">Evolución de una materia o de mis pesos</option>
+                <option value="subjects">Materias, lado a lado</option>
+                <option value="cohorts">Evaluados por año</option>
+                <option value="pairs">Diferencias frente a un colegio</option>
+              </select>
+              <details>
+                <label for="chart-scale">Escala de las gráficas de puntos y líneas</label>
+                <summary>Opciones de escala</summary>
+                <select id="chart-scale">
+                  <option value="focused">Enfocar los valores observados</option>
+                  <option value="full">Mostrar escala completa</option>
+                </select>
+              </details>
+              <p id="scale-note" class="hint">
+                Escala ajustada: revisa los valores del eje al comparar diferencias.
+              </p>
+              <details>
+                <summary>Consultar un colegio y año</summary>
                 <div class="chart-controls">
                   <label>Resaltar o consultar colegio<select id="chart-highlight"></select></label
                   ><label>Consultar año<select id="chart-inspect-year"></select></label>
                 </div>
-                <p
-                  id="chart-point-readout"
-                  class="chart-readout"
-                  role="status"
-                  aria-live="polite"
-                ></p>
-                <div id="mean-legend" class="legend"></div>
-                <div
-                  id="mean-chart"
-                  class="chart-scroll"
-                  tabindex="0"
-                  role="region"
-                  aria-label="Promedio general anual; valores accesibles en la tabla siguiente"
-                ></div>
-                <p class="hint">
-                  Pasa el cursor o toca un punto para consultar su valor. Con teclado, usa los
-                  selectores anteriores. Las líneas se interrumpen si falta un año; no se estiman
-                  datos.
-                </p>
-                <details>
-                  <summary>Valores del promedio general anual</summary>
-                  <div
-                    id="mean-table"
-                    class="table-wrap"
-                    data-label="Promedio general de cada colegio en cada año"
-                  ></div>
-                </details>
-              </section>
-              <div class="chart-controls card">
+              </details>
+              <p
+                id="chart-point-readout"
+                class="chart-readout"
+                role="status"
+                aria-live="polite"
+              ></p>
+              <div class="chart-controls card" id="lab-metric-control">
                 <label
                   >Materia o indicador para las siguientes comparaciones<select id="lab-metric">
                     <option value="mean">Promedio general /100</option>
@@ -478,18 +484,67 @@
                     <option value="4">Inglés</option>
                   </select></label
                 >
-                <p class="hint">
-                  Cambiar esta opción actualiza el cambio entre años y el gráfico de puntaje frente
-                  a evaluados. La evolución del promedio general de arriba se conserva.
-                </p>
               </div>
-              <section class="card">
+            </div>
+            <details>
+              <summary>Calidad de los datos y límites de la comparación</summary>
+              <div id="chart-quality" class="card"></div>
+            </details>
+            <p id="chart-empty" class="empty" hidden="">
+              Elige colegios con resultados que cumplan tus filtros. Los colegios excluidos siguen
+              visibles en el resumen de selección.
+            </p>
+            <div id="chart-panels">
+              <section
+                class="card"
+                aria-labelledby="annual-mean-title"
+                data-comparison-panel="annual"
+              >
+                <h3 id="annual-mean-title" tabindex="-1">Promedio general por colegio y año</h3>
+                <details>
+                  <summary>Cómo se calcula este promedio</summary>
+                  <p>
+                    Promedio simple de las cinco materias, de 0 a 100. Esta gráfica permanece
+                    independiente de tus pesos y de la materia que explores abajo. No es el puntaje
+                    global oficial del ICFES. Dentro de cada año, las jornadas elegidas se combinan
+                    ponderando por evaluados antes de promediar las cinco materias.
+                  </p>
+                </details>
+
+                <div id="mean-legend" class="legend"></div>
+                <div
+                  id="mean-chart"
+                  class="chart-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label="Promedio general anual; valores accesibles en la tabla siguiente"
+                ></div>
+                <details>
+                  <summary>Cómo leer esta gráfica</summary>
+                  <p class="hint">
+                    Pasa el cursor o toca un punto para consultar su valor. Con teclado, usa los
+                    selectores anteriores. Las líneas se interrumpen si falta un año; no se estiman
+                    datos.
+                  </p>
+                </details>
+                <details>
+                  <summary>Valores del promedio general anual</summary>
+                  <div
+                    id="mean-table"
+                    class="table-wrap"
+                    data-label="Promedio general de cada colegio en cada año"
+                  ></div>
+                </details>
+              </section>
+
+              <section class="card" data-comparison-panel="change">
                 <h3 id="chart-change-title" tabindex="-1">¿Cuánto cambió entre dos años?</h3>
                 <div class="chart-controls">
                   <label>Desde<select id="lab-from"></select></label
                   ><label>Hasta<select id="lab-to"></select></label>
                 </div>
                 <p id="change-description"></p>
+                <div class="legend chart-legend" data-local-legend=""></div>
                 <div
                   id="change-chart"
                   class="chart-scroll"
@@ -497,20 +552,27 @@
                   role="region"
                   aria-label="Cambio entre dos años, con valores en la tabla"
                 ></div>
-                <div
-                  id="change-table"
-                  class="table-wrap"
-                  data-label="Valores iniciales, finales y cambio en puntos"
-                ></div>
-                <p class="hint">
-                  Compara cohortes distintas. Un aumento no demuestra que el colegio haya causado
-                  esa mejora. Si falta alguno de los dos años, no se calcula el cambio.
-                </p>
+                <details>
+                  <summary>Ver valores y cambios exactos</summary>
+                  <div
+                    id="change-table"
+                    class="table-wrap"
+                    data-label="Valores iniciales, finales y cambio en puntos"
+                  ></div>
+                </details>
+                <details>
+                  <summary>Cómo leer esta gráfica</summary>
+                  <p class="hint">
+                    Compara cohortes distintas. Un aumento no demuestra que el colegio haya causado
+                    esa mejora. Si falta alguno de los dos años, no se calcula el cambio.
+                  </p>
+                </details>
               </section>
-              <section class="card">
+              <section class="card" data-comparison-panel="scatter">
                 <h3 id="chart-scatter-title" tabindex="-1">Puntaje y número de evaluados</h3>
                 <label for="lab-year">Año de la comparación</label
                 ><select id="lab-year"></select>
+                <div class="legend chart-legend" data-local-legend=""></div>
                 <div
                   id="cohort-scatter"
                   class="chart-scroll"
@@ -518,18 +580,25 @@
                   role="region"
                   aria-label="Puntaje frente a evaluados; valores en la tabla siguiente"
                 ></div>
-                <div
-                  id="scatter-table"
-                  class="table-wrap"
-                  data-label="Puntaje y evaluados por colegio"
-                ></div>
-                <p class="hint">
-                  Cada punto es un colegio en ese año; todos los puntos tienen el mismo tamaño.
-                  Pueden superponerse: usa Resaltar colegio o la tabla para distinguirlos. El número
-                  de evaluados no explica por sí solo el puntaje y no representa la matrícula total.
-                </p>
+                <details>
+                  <summary>Ver puntajes y evaluados</summary>
+                  <div
+                    id="scatter-table"
+                    class="table-wrap"
+                    data-label="Puntaje y evaluados por colegio"
+                  ></div>
+                </details>
+                <details>
+                  <summary>Cómo leer esta gráfica</summary>
+                  <p class="hint">
+                    Cada punto es un colegio en ese año; todos los puntos tienen el mismo tamaño.
+                    Pueden superponerse: usa Resaltar colegio o la tabla para distinguirlos. El
+                    número de evaluados no explica por sí solo el puntaje y no representa la
+                    matrícula total.
+                  </p>
+                </details>
               </section>
-              <section class="card">
+              <section class="card" data-comparison-panel="sensitivity">
                 <h3 id="chart-sensitivity-title" tabindex="-1">
                   ¿Cambia la posición si cambian tus prioridades?
                 </h3>
@@ -549,11 +618,18 @@
                   value="100"
                   aria-describedby="scenario-help"
                 />
-                <p id="scenario-help" class="hint">
-                  0 % = las cinco materias pesan igual. 100 % = tus pesos actuales. Es una mezcla de
-                  escenarios, no un nivel de confianza.
-                </p>
-                <div id="scenario-weights" class="weight-breakdown"></div>
+                <details>
+                  <summary>Cómo leer esta gráfica</summary>
+                  <p id="scenario-help" class="hint">
+                    0 % = las cinco materias pesan igual. 100 % = tus pesos actuales. Es una mezcla
+                    de escenarios, no un nivel de confianza.
+                  </p>
+                </details>
+                <details>
+                  <summary>Ver pesos del escenario</summary>
+                  <div id="scenario-weights" class="weight-breakdown"></div>
+                </details>
+                <div class="legend chart-legend" data-local-legend=""></div>
                 <div
                   id="sensitivity-chart"
                   class="chart-scroll"
@@ -561,35 +637,47 @@
                   role="region"
                   aria-label="Posiciones según cinco escenarios; valores en la tabla"
                 ></div>
-                <div
-                  id="sensitivity-table"
-                  class="table-wrap"
-                  data-label="Posición y puntaje en el escenario explorado"
-                ></div>
+                <details>
+                  <summary>Ver posiciones y puntajes</summary>
+                  <div
+                    id="sensitivity-table"
+                    class="table-wrap"
+                    data-label="Posición y puntaje en el escenario explorado"
+                  ></div>
+                </details>
                 <div class="presets">
                   <button id="apply-chart-scenario" class="primary">
                     Aplicar este escenario al ranking</button
                   ><button data-goto="priorities">Modificar mis pesos de destino</button>
                 </div>
-                <p id="sensitivity-description" class="hint"></p>
+                <details>
+                  <summary>Cómo interpretar esta comparación</summary>
+                  <p id="sensitivity-description" class="hint"></p>
+                </details>
               </section>
-              <p class="hint">
-                Inspiración visual:
-                <a href="https://python-graph-gallery.com/" target="_blank" rel="noopener"
-                  >Python Graph Gallery</a
-                >
-                — líneas, puntos y segmentos. Implementación interactiva propia en JavaScript, con
-                los datos verificados del tablero.
-              </p>
+              <details>
+                <summary>Créditos de las gráficas</summary>
+                <p class="hint">
+                  Inspiración visual:
+                  <a href="https://python-graph-gallery.com/" target="_blank" rel="noopener"
+                    >Python Graph Gallery</a
+                  >
+                  — líneas, puntos y segmentos. Implementación interactiva propia en JavaScript, con
+                  los datos verificados del tablero.
+                </p>
+              </details>
             </div>
           </section>
           <div id="comparison-content">
-            <div class="card">
+            <div class="card" data-comparison-panel="trend">
               <h3>Evolución de los resultados</h3>
-              <p class="hint">
-                Cada punto es un año con datos. Consulta los valores exactos en la tabla debajo de
-                la gráfica; los años faltantes no se rellenan.
-              </p>
+              <details>
+                <summary>Cómo leer esta gráfica</summary>
+                <p class="hint">
+                  Cada punto es un año con datos. Consulta los valores exactos en la tabla debajo de
+                  la gráfica; los años faltantes no se rellenan.
+                </p>
+              </details>
               <div id="legend" class="legend"></div>
               <div
                 id="trend"
@@ -606,23 +694,29 @@
                 ></div>
               </details>
             </div>
-            <div class="card">
+            <div class="card" data-comparison-panel="subjects">
               <h3>Materias, lado a lado</h3>
-              <p class="hint">
-                Promedios históricos, escala de 0 a 100. La intensidad del color representa el
-                puntaje.
-              </p>
+              <details>
+                <summary>Cómo leer esta gráfica</summary>
+                <p class="hint">
+                  Promedios históricos, escala de 0 a 100. La intensidad del color representa el
+                  puntaje.
+                </p>
+              </details>
               <div id="subjects" class="table-wrap"></div>
             </div>
-            <div class="card">
+            <div class="card" data-comparison-panel="cohorts">
               <h3>¿Cuántos estudiantes presentaron el examen?</h3>
-              <p class="hint">
-                Evaluados por colegio y año. Menos de 20 se señala como cohorte pequeña, sin
-                penalizar el puntaje.
-              </p>
+              <details>
+                <summary>Cómo leer esta gráfica</summary>
+                <p class="hint">
+                  Evaluados por colegio y año. Menos de 20 se señala como cohorte pequeña, sin
+                  penalizar el puntaje.
+                </p>
+              </details>
               <div id="cohorts"></div>
             </div>
-            <section class="card">
+            <section class="card" data-comparison-panel="pairs">
               <h3>Comparación directa en años comunes</h3>
               <p>
                 Compara cada colegio con uno de referencia. La diferencia usa únicamente los años
@@ -631,16 +725,22 @@
               <label for="baseline-school">Colegio de referencia</label
               ><select id="baseline-school"></select>
               <div id="pair-chart" class="ranking-chart"></div>
-              <div
-                id="pair-table"
-                class="table-wrap"
-                data-label="Comparaciones entre colegios en años comunes"
-              ></div>
-              <p class="hint">
-                Son diferencias descriptivas de promedios, no pruebas de significancia estadística
-                ni medidas del efecto del colegio. La base no permite seguir a los mismos
-                estudiantes entre años.
-              </p>
+              <details>
+                <summary>Ver diferencias y años comunes</summary>
+                <div
+                  id="pair-table"
+                  class="table-wrap"
+                  data-label="Comparaciones entre colegios en años comunes"
+                ></div>
+              </details>
+              <details>
+                <summary>Cómo leer esta gráfica</summary>
+                <p class="hint">
+                  Son diferencias descriptivas de promedios, no pruebas de significancia estadística
+                  ni medidas del efecto del colegio. La base no permite seguir a los mismos
+                  estudiantes entre años.
+                </p>
+              </details>
             </section>
           </div>
         </section>
@@ -714,14 +814,14 @@
       <div id="school-detail"></div>
     </dialog>
     <script src="engine.js?v=4"></script>
-    <script src="state.js?v=5"></script>
+    <script src="state.js?v=7"></script>
     <script src="data-loader.js?v=3"></script>
-    <script src="ui.js?v=4"></script>
+    <script src="ui.js?v=7"></script>
     <script src="subject-guide.js?v=4"></script>
     <script src="comparisons.js?v=4"></script>
-    <script src="journey.js?v=6"></script>
-    <script src="chart-stats.js?v=5"></script>
-    <script src="chart-lab.js?v=5"></script>
-    <script src="app.js?v=6"></script>
+    <script src="journey.js?v=7"></script>
+    <script src="chart-stats.js?v=7"></script>
+    <script src="chart-lab.js?v=7"></script>
+    <script src="app.js?v=7"></script>
   </body>
 </html>

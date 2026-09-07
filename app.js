@@ -88,12 +88,17 @@ function renderPlaces() {
   }
   const selected = new Set(state.places);
   $('places').innerHTML =
-    shownPlaces()
+    (norm($('place-search').value) || $('browse-places').checked ? shownPlaces() : [])
       .map(
         (p) =>
           `<label class="check"><input type="checkbox" data-place="${p.id}" ${selected.has(p.id) ? 'checked' : ''}><span>${esc(p.town)}<small>${esc(p.department)}</small></span></label>`
       )
-      .join('') || '<p class="hint">No hay coincidencias.</p>';
+      .join('') ||
+    '<p class="hint">' +
+      (norm($('place-search').value)
+        ? 'No hay coincidencias.'
+        : 'Escribe un nombre para añadir un municipio.') +
+      '</p>';
   $('place-count').textContent = `${fmt(state.places.length, 0)} municipios seleccionados`;
 }
 function syncControls() {
@@ -227,25 +232,30 @@ function renderComparison() {
   $('legend').innerHTML = rows
     .map(
       (r, i) =>
-        `<span><i class="dot" style="background:${colors[i]}"></i>${esc(r.name)} · ${esc(r.town)}</span>`
+        `<span><i class="dot" style="background:${colors[state.selected.indexOf(r.id)]}"></i>${esc(r.name)} · ${esc(r.town)}</span>`
     )
     .join('');
   const years = [...state.years].sort(),
     max = state.metric === 'total' ? 500 : 100,
-    W = 760,
+    W = Math.min(900, Math.max(240, ($('compare-view').clientWidth || 900) - 32)),
     H = 310,
     L = 48,
     R = 22,
     T = 20,
     B = 40;
+  const bounds = ChartStats.domain(
+    rows.flatMap((r) => years.map((yr) => (r.byYear[yr] ? metricValue(r.byYear[yr]) : null))),
+    max,
+    state.chartOptions?.scale === 'full'
+  );
   const x = (y) =>
       years.length === 1 ? W / 2 : L + ((y - years[0]) / (years.at(-1) - years[0])) * (W - L - R),
-    y = (v) => H - B - (v / max) * (H - T - B);
+    y = (v) => H - B - ((v - bounds.min) / (bounds.max - bounds.min)) * (H - T - B);
   let svg = `<svg class="trend-svg" viewBox="0 0 ${W} ${H}" aria-hidden="true"><title>Evolución anual de ${esc(metricName())}; valores exactos en las fichas de cada colegio</title>`;
-  for (let v = 0; v <= max; v += max / 5)
-    svg += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#e0e6db"/><text x="${L - 9}" y="${y(v) + 4}" text-anchor="end" font-size="20" fill="#576b64">${v}</text>`;
+  for (const v of bounds.ticks)
+    svg += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#e0e6db"/><text x="${L - 9}" y="${y(v) + 4}" text-anchor="end" font-size="14" fill="#576b64">${v}</text>`;
   for (const yr of years)
-    svg += `<text x="${x(yr)}" y="${H - 12}" text-anchor="middle" font-size="20" fill="#173a35">${yr}</text>`;
+    svg += `<text x="${x(yr)}" y="${H - 12}" text-anchor="middle" font-size="14" fill="#173a35">${yr}</text>`;
   rows.forEach((r, i) => {
     let previous = null;
     for (const yr of years) {
@@ -257,9 +267,9 @@ function renderComparison() {
       const px = x(yr),
         py = y(metricValue(a));
       if (previous && yr - previous.year === 1)
-        svg += `<line x1="${previous.x}" y1="${previous.y}" x2="${px}" y2="${py}" stroke="${colors[i]}" stroke-width="2.5" stroke-dasharray="${['none', '8 4', '3 3', '12 4 3 4', '2 5', '14 6'][i]}"/>`;
+        svg += `<line x1="${previous.x}" y1="${previous.y}" x2="${px}" y2="${py}" stroke="${colors[state.selected.indexOf(r.id)]}" stroke-width="2.5" stroke-dasharray="${['none', '8 4', '3 3', '12 4 3 4', '2 5', '14 6'][i]}"/>`;
       const label = `${r.name}, ${yr}: ${fmt(metricValue(a))}; ${a.n} evaluados`;
-      svg += `<circle cx="${px}" cy="${py}" r="5" fill="${colors[i]}" stroke="white" stroke-width="1.5" aria-label="${esc(label)}"><title>${esc(label)}</title></circle>`;
+      svg += `<circle cx="${px}" cy="${py}" r="5" fill="${colors[state.selected.indexOf(r.id)]}" stroke="white" stroke-width="1.5" aria-label="${esc(label)}"><title>${esc(label)}</title></circle>`;
       previous = { x: px, y: py, year: yr };
     }
   });
@@ -276,7 +286,7 @@ function renderComparison() {
           `<div class="cohort-year"><h4>${yr}</h4>${rows
             .map((r, i) => {
               const a = r.byYear[yr];
-              return `<div class="bar-row"><button class="bar-name" data-detail="${r.id}">${esc(r.name)}</button><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:${colors[i]};width:${a ? (a.n / maxN) * 100 : 0}%"></div></div><strong title="${a && a.n < 20 ? 'Cohorte pequeña: menos de 20 evaluados' : ''}">${a ? fmt(a.n, 0) + (a.n < 20 ? ' *' : '') : '—'}</strong></div>`;
+              return `<div class="bar-row"><button class="bar-name" data-detail="${r.id}">${esc(r.name)}</button><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:${colors[state.selected.indexOf(r.id)]};width:${a ? (a.n / maxN) * 100 : 0}%"></div></div><strong title="${a && a.n < 20 ? 'Cohorte pequeña: menos de 20 evaluados' : ''}">${a ? fmt(a.n, 0) + (a.n < 20 ? ' *' : '') : '—'}</strong></div>`;
             })
             .join('')}</div>`
       )
@@ -381,6 +391,7 @@ function download() {
 }
 function bind() {
   $('department').onchange = renderPlaces;
+  $('browse-places').onchange = renderPlaces;
   $('place-search').oninput = renderPlaces;
   $('next-place-search').onclick = () => {
     $('place-search').value = '';

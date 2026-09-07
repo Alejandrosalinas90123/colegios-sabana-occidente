@@ -1,10 +1,10 @@
 /* Native SVG charts plus equivalent HTML controls/tables. Charts never own data
    filters: all values come from the current verified SchoolEngine result. */
 const ChartLab = (() => {
-  const W = 900,
-    H = 340,
-    L = 76,
-    R = 40,
+  let W = 900;
+  const H = 320,
+    L = 48,
+    R = 32,
     T = 40,
     B = 64;
   let mounted = false,
@@ -18,6 +18,17 @@ const ChartLab = (() => {
       ? 'chart-series muted'
       : 'chart-series';
   const tick = (v) => fmt(v, Number.isInteger(v) ? 0 : 1);
+  const panels = [
+    'annual',
+    'change',
+    'scatter',
+    'sensitivity',
+    'trend',
+    'subjects',
+    'cohorts',
+    'pairs',
+  ];
+  const domain = (values, max = 100) => ChartStats.domain(values, max, options().scale === 'full');
   function ensure() {
     if (!state.chartOptions)
       state.chartOptions = {
@@ -29,6 +40,8 @@ const ChartLab = (() => {
         highlight: null,
       };
     const o = options();
+    if (!panels.includes(o.panel)) o.panel = 'annual';
+    if (!['focused', 'full'].includes(o.scale)) o.scale = 'focused';
     if (!state.years.includes(o.year)) o.year = state.years.at(-1) ?? 2025;
     if (!state.years.includes(o.from)) o.from = state.years[0] ?? 2021;
     if (!state.years.includes(o.to)) o.to = state.years.at(-1) ?? 2025;
@@ -43,24 +56,24 @@ const ChartLab = (() => {
   }
   function axes(xTicks, yTicks, scale, xTitle, yTitle) {
     return (
-      `<svg class="lab-svg" viewBox="0 0 ${W} ${H}" aria-hidden="true"><text x="${L}" y="20" font-size="18" fill="#173a35">${esc(yTitle)}</text>` +
+      `<svg class="lab-svg" viewBox="0 0 ${W} ${H}" aria-hidden="true"><text x="${L}" y="20" font-size="14" fill="#173a35">${esc(yTitle)}</text>` +
       yTicks
         .map(
           (v) =>
-            `<line x1="${L}" x2="${W - R}" y1="${scale.y(v)}" y2="${scale.y(v)}" stroke="#ccd7cc"/><text x="${L - 12}" y="${scale.y(v) + 6}" text-anchor="end" font-size="18" fill="#455b53">${tick(v)}</text>`
+            `<line x1="${L}" x2="${W - R}" y1="${scale.y(v)}" y2="${scale.y(v)}" stroke="#ccd7cc"/><text x="${L - 12}" y="${scale.y(v) + 6}" text-anchor="end" font-size="14" fill="#455b53">${tick(v)}</text>`
         )
         .join('') +
       xTicks
         .map(
           (v) =>
-            `<text x="${scale.x(v)}" y="${H - B + 28}" text-anchor="middle" font-size="18" fill="#455b53">${tick(v)}</text>`
+            `<text x="${scale.x(v)}" y="${H - B + 28}" text-anchor="middle" font-size="14" fill="#455b53">${xTitle === 'Año' ? String(v) : tick(v)}</text>`
         )
         .join('') +
-      `<text x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle" font-size="18" fill="#173a35">${esc(xTitle)}</text>`
+      `<text x="${(L + W - R) / 2}" y="${H - 8}" text-anchor="middle" font-size="14" fill="#173a35">${esc(xTitle)}</text>`
     );
   }
   function point(id, year, x, y, label, index) {
-    return `<g class="${seriesClass(id)}" data-series="${id}"><circle cx="${x}" cy="${y}" r="9" fill="${color(id)}" stroke="white" stroke-width="2"/>${index !== undefined ? `<text x="${x + 12}" y="${y + 6}" font-size="18" fill="#173a35">${index + 1}</text>` : ''}<circle cx="${x}" cy="${y}" r="30" fill="transparent" pointer-events="${options().highlight === null || options().highlight === id ? 'all' : 'none'}" data-chart-point="${id}" data-chart-year="${year}" data-chart-label="${esc(label)}"><title>${esc(label)}</title></circle></g>`;
+    return `<g class="${seriesClass(id)}" data-series="${id}"><circle cx="${x}" cy="${y}" r="9" fill="${color(id)}" stroke="white" stroke-width="2"/>${index !== undefined ? `<text x="${x + 12}" y="${y + 6}" font-size="14" fill="#173a35">${index + 1}</text>` : ''}<circle cx="${x}" cy="${y}" r="30" fill="transparent" pointer-events="${options().highlight === null || options().highlight === id ? 'all' : 'none'}" data-chart-point="${id}" data-chart-year="${year}" data-chart-label="${esc(label)}"><title>${esc(label)}</title></circle></g>`;
   }
   function table(headers, rows, caption) {
     return `<table><caption>${esc(caption)}</caption><thead><tr>${headers.map((s) => `<th>${esc(s)}</th>`).join('')}</tr></thead><tbody>${rows.map((row) => `<tr>${row.map((value, i) => `<${i ? 'td' : 'th'}>${esc(value)}</${i ? 'td' : 'th'}>`).join('')}</tr>`).join('')}</tbody></table>`;
@@ -84,8 +97,9 @@ const ChartLab = (() => {
   function annualMean() {
     const years = lastYears,
       s = ChartStats.annual(lastRows, years),
-      scale = scales(years[0], years.at(-1), 0, 100);
-    let svg = axes(years, [0, 20, 40, 60, 80, 100], scale, 'Año', 'Promedio general /100');
+      bounds = domain(s.flatMap((series) => series.points.map((p) => p.value))),
+      scale = scales(years[0], years.at(-1), bounds.min, bounds.max);
+    let svg = axes(years, bounds.ticks, scale, 'Año', 'Promedio general /100');
     for (const [index, series] of s.entries()) {
       let prev = null;
       for (const p of series.points) {
@@ -106,12 +120,14 @@ const ChartLab = (() => {
       }
     }
     $('mean-chart').innerHTML = svg + '</svg>';
-    $('mean-legend').innerHTML = lastRows
+    const legend = lastRows
       .map(
         (row, i) =>
-          `<span><i class="dot" style="background:${color(row.id)}"></i>${i + 1}. ${esc(row.name)} · ${esc(row.town)}</span>`
+          `<button data-chart-school="${row.id}" aria-pressed="${options().highlight === row.id}"><i class="dot" style="background:${color(row.id)}"></i><span>${i + 1}. ${esc(row.name)} · ${esc(row.town)}</span></button>`
       )
       .join('');
+    $('mean-legend').innerHTML = legend;
+    document.querySelectorAll('[data-local-legend]').forEach((el) => (el.innerHTML = legend));
     $('mean-table').innerHTML = table(
       ['Colegio', ...years],
       s.map((series) => [
@@ -132,16 +148,20 @@ const ChartLab = (() => {
       ? `${name(metric)}: ${o.from} → ${o.to}. Círculo abierto: inicio; círculo lleno: final. Cambio en puntos, no en porcentaje.`
       : 'Elige dos años distintos y coloca el año más antiguo en Desde.';
     const points = ChartStats.endpoints(lastRows, o.from, o.to, metric);
+    const bounds = domain(
+      points.flatMap((p) => [p.from, p.to]),
+      max
+    );
     const height = Math.max(160, lastRows.length * 72 + 70),
-      x = (v) => L + (v / max) * (W - L - R);
+      x = (v) => L + ((v - bounds.min) / (bounds.max - bounds.min)) * (W - L - R);
     let svg = `<svg class="lab-svg" viewBox="0 0 ${W} ${height}" aria-hidden="true">`;
-    for (let v = 0; v <= max; v += max / 5)
-      svg += `<line x1="${x(v)}" x2="${x(v)}" y1="20" y2="${height - 40}" stroke="#ccd7cc"/><text x="${x(v)}" y="${height - 12}" text-anchor="middle" font-size="18">${v}</text>`;
+    for (const v of bounds.ticks)
+      svg += `<line x1="${x(v)}" x2="${x(v)}" y1="20" y2="${height - 40}" stroke="#ccd7cc"/><text x="${x(v)}" y="${height - 12}" text-anchor="middle" font-size="14">${tick(v)}</text>`;
     points.forEach((p, i) => {
       const y = 42 + i * 72;
-      svg += `<text x="30" y="${y + 6}" font-size="20">${i + 1}</text>`;
+      svg += `<text x="30" y="${y + 6}" font-size="14">${i + 1}</text>`;
       if (!valid || p.change === null) {
-        svg += `<text x="${L}" y="${y + 6}" font-size="18">${valid ? 'Falta alguno de los años' : 'Selecciona un intervalo válido'}</text>`;
+        svg += `<text x="${L}" y="${y + 6}" font-size="14">${valid ? 'Falta alguno de los años' : 'Selecciona un intervalo válido'}</text>`;
         return;
       }
       svg += `<g class="${seriesClass(p.id)}"><line x1="${x(p.from)}" x2="${x(p.to)}" y1="${y}" y2="${y}" stroke="${color(p.id)}" stroke-width="4"/><circle cx="${x(p.from)}" cy="${y}" r="10" stroke="${color(p.id)}" stroke-width="3" fill="white"/></g>`;
@@ -175,10 +195,14 @@ const ChartLab = (() => {
       metric = o.metric,
       max = metric === 'total' ? 500 : 100;
     const xMax = Math.max(20, Math.ceil(maxN / 20) * 20),
-      scale = scales(0, xMax, 0, max);
+      bounds = domain(
+        rows.map((row) => ChartStats.value(row.byYear[o.year], metric)),
+        max
+      ),
+      scale = scales(0, xMax, bounds.min, bounds.max);
     let svg = axes(
       [0, xMax / 4, xMax / 2, xMax * 0.75, xMax],
-      [0, max / 5, (2 * max) / 5, (3 * max) / 5, (4 * max) / 5, max],
+      bounds.ticks,
       scale,
       'Evaluados en el año',
       `${name(metric)} /${max}`
@@ -232,7 +256,7 @@ const ChartLab = (() => {
       [0, 25, 50, 75, 100],
       ticks,
       scale,
-      'Mezcla hacia tus prioridades (%)',
+      'Tus prioridades (%)',
       'Posición · menor es mejor'
     );
     series.forEach((s) => {
@@ -291,6 +315,7 @@ const ChartLab = (() => {
     lastRows = state.selected.map((id) => result.rows.find((row) => row.id === id)).filter(Boolean);
     lastYears = [...state.years].sort();
     if (!lastRows.some((row) => row.id === options().highlight)) options().highlight = null;
+    W = Math.min(900, Math.max(240, ($('compare-view').clientWidth || 900) - 32));
     quality();
     $('chart-empty').hidden = lastRows.length > 0;
     $('chart-panels').hidden = !lastRows.length;
@@ -317,11 +342,58 @@ const ChartLab = (() => {
     scatter();
     sensitivity();
     readout();
+    $('chart-point-readout').hidden = options().highlight === null;
+    showPanel();
     DashboardUI.labelTables($('chart-lab'));
+  }
+  function showPanel() {
+    const panel = options().panel;
+    $('comparison-question').value = panel;
+    $('chart-scale').value = options().scale;
+    document
+      .querySelectorAll('[data-comparison-panel]')
+      .forEach((el) => (el.hidden = el.dataset.comparisonPanel !== panel));
+    $('compare-metric').closest('label').hidden = !['trend', 'pairs'].includes(panel);
+    $('lab-metric-control').hidden = !['change', 'scatter'].includes(panel);
+    $('chart-scale').parentElement.querySelector('label[for="chart-scale"]').hidden = ![
+      'annual',
+      'change',
+      'scatter',
+      'trend',
+    ].includes(panel);
+    $('chart-scale').hidden = !['annual', 'change', 'scatter', 'trend'].includes(panel);
+    $('chart-scale').closest('details').hidden = $('chart-scale').hidden;
+    $('scale-note').hidden = $('chart-scale').hidden;
+    $('scale-note').textContent =
+      options().scale === 'full'
+        ? 'Escala completa del puntaje.'
+        : 'Escala ajustada a los valores observados: el eje puede no empezar en cero.';
+    $('comparison-content').hidden =
+      !lastRows.length || !['trend', 'subjects', 'cohorts', 'pairs'].includes(panel);
   }
   function initialize() {
     ensure();
     mounted = true;
+    for (const [id, key] of [
+      ['comparison-question', 'panel'],
+      ['chart-scale', 'scale'],
+    ])
+      $(id).onchange = (e) => {
+        options()[key] = e.target.value;
+        renderComparison();
+        render();
+        save();
+      };
+    let resizing;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizing);
+      resizing = setTimeout(() => {
+        if (state.view === 'compare') {
+          renderComparison();
+          render();
+        }
+      }, 100);
+    });
     for (const [id, key] of [
       ['chart-inspect-year', 'year'],
       ['lab-year', 'year'],
@@ -356,6 +428,16 @@ const ChartLab = (() => {
     // Supplemental pointer interaction; selects and HTML tables expose the same
     // values without relying on SVG hit areas or hover-only information.
     $('chart-lab').addEventListener('click', (e) => {
+      const legend = e.target.closest('[data-chart-school]');
+      if (legend) {
+        const id = Number(legend.dataset.chartSchool);
+        options().highlight = options().highlight === id ? null : id;
+        render();
+        save();
+        document
+          .querySelector(`[data-comparison-panel="${options().panel}"] [data-chart-school="${id}"]`)
+          ?.focus({ preventScroll: true });
+      }
       const p = e.target.closest('[data-chart-point]');
       if (p) inspect(Number(p.dataset.chartPoint), Number(p.dataset.chartYear));
       const jump = e.target.closest('[data-chart-goto]');

@@ -85,3 +85,15 @@ HTML, CSS y JavaScript estáticos; sin framework ni dependencias de gráficos. `
 `verification.json` documenta recuentos y hashes SHA-256. La transformación conservó cada ubicación, año, puntaje, número de evaluados, sector, jornada y calendario. Se verificaron las 59.318 combinaciones colegio/año, la conservación de evaluados, los 66 historiales completos diurnos del tablero regional anterior, municipios homónimos y enlaces compartidos.
 
 Los identificadores dependen de la versión 2 de la base, que permanece fija en 2021–2025. No se fusionan nombres distintos ni se rellenan años ausentes. Los evaluados acumulados son cohortes, no personas únicas. La marca de menos de 20 evaluados es informativa y no altera las posiciones.
+
+
+## Presentación simplificada (v7)
+
+- Una comparación visible por vez, elegida desde «¿Qué quieres comparar?». Se conservan las ocho vistas y los datos descargables.
+- Municipios buscados de uno en uno; listas completas, tablas y explicaciones bajo controles desplegables. Colegios elegidos permanecen disponibles para revisión.
+- SVG ajustados al ancho de su contenedor y redibujados al cambiar el tamaño. Tablas de comparación presentadas como fichas con etiquetas en pantallas pequeñas.
+- Líneas y puntos usan por defecto un dominio que incluye todos los valores observados, con margen y aviso de escala ajustada. La escala completa sigue disponible. Barras mantienen su origen en cero.
+- Leyendas locales y colores consistentes por colegio. El promedio general permanece independiente de los pesos personalizados.
+- Pruebas de dominios, extremos cero/cien, invariancia numérica, una vista visible y coordenadas SVG en un ancho simulado de 360 píxeles. La simulación DOM no reemplaza una auditoría en dispositivos reales.
+
+Referencias de presentación: [Datawrapper: gráficos de líneas](https://academy.datawrapper.de/article/129-what-to-consider-when-creating-line-charts) y [NN/g: información progresiva](https://www.nngroup.com/articles/progressive-disclosure/).

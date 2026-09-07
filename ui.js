@@ -115,6 +115,14 @@ const DashboardUI = (() => {
       );
       region.querySelectorAll('thead th').forEach((th) => (th.scope = 'col'));
       region.querySelectorAll('tbody th').forEach((th) => (th.scope = 'row'));
+      region.querySelectorAll('table').forEach((table) => {
+        const headings = [...table.querySelectorAll('thead th')].map((th) => th.textContent);
+        table.querySelectorAll('tbody tr').forEach((row) =>
+          [...row.children].forEach((cell, i) => {
+            if (cell.tagName === 'TD') cell.dataset.column = headings[i] || '';
+          })
+        );
+      });
     });
   }
   return {

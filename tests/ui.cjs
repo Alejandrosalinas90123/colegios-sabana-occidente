@@ -111,7 +111,10 @@ function contrast(a, b) {
   w.document.querySelector('[data-open-picker]').click();
   assert.equal($('step-schools').hidden, false);
   const option = $('school-picker').querySelectorAll('.school-option')[10];
-  const manual = { id: option.querySelector('button').dataset.pick, name: option.querySelector('strong').textContent };
+  const manual = {
+    id: option.querySelector('button').dataset.pick,
+    name: option.querySelector('strong').textContent,
+  };
   $('pick-school-search').value = manual.name;
   $('pick-school-search').dispatchEvent(new w.Event('input'));
   $('school-picker').querySelector(`[data-pick="${manual.id}"]`).click();
@@ -145,6 +148,9 @@ function contrast(a, b) {
   $('journey-next').click();
   assert.equal($('step-places').hidden, false);
   assert.equal($('step-error').hidden, false);
+  assert.equal($('places').querySelectorAll('[data-place]').length, 0);
+  $('browse-places').checked = true;
+  $('browse-places').dispatchEvent(new w.Event('change'));
   const municipality = $('places').querySelector('[data-place]');
   municipality.checked = true;
   municipality.dispatchEvent(new w.Event('change', { bubbles: true }));
@@ -173,6 +179,45 @@ function contrast(a, b) {
   assert.ok($('pair-table').textContent.includes('2021'));
   assert.equal($('mean-table').querySelectorAll('tbody tr').length, 2);
   const fixedAnnualValues = $('mean-table').textContent;
+  Object.defineProperty($('compare-view'), 'clientWidth', { value: 360, configurable: true });
+  for (const panel of [
+    'annual',
+    'change',
+    'scatter',
+    'sensitivity',
+    'trend',
+    'subjects',
+    'cohorts',
+    'pairs',
+  ]) {
+    $('comparison-question').value = panel;
+    $('comparison-question').dispatchEvent(new w.Event('change'));
+    const visible = [...w.document.querySelectorAll('[data-comparison-panel]')].filter(
+      (el) => !el.hidden
+    );
+    assert.equal(visible.length, 1);
+    assert.equal(visible[0].dataset.comparisonPanel, panel);
+    for (const svg of visible[0].querySelectorAll('svg')) {
+      const width = Number(svg.getAttribute('viewBox').split(' ')[2]);
+      assert.ok(width <= 360, 'Mobile chart must fit its viewport');
+      for (const point of svg.querySelectorAll('circle')) {
+        assert.ok(
+          Number(point.getAttribute('cx')) >= 0 && Number(point.getAttribute('cx')) <= width
+        );
+      }
+    }
+  }
+  $('comparison-question').value = 'annual';
+  $('comparison-question').dispatchEvent(new w.Event('change'));
+  $('chart-scale').value = 'full';
+  $('chart-scale').dispatchEvent(new w.Event('change'));
+  assert.equal($('mean-table').textContent, fixedAnnualValues);
+  $('chart-scale').value = 'focused';
+  $('chart-scale').dispatchEvent(new w.Event('change'));
+  assert.equal($('mean-table').textContent, fixedAnnualValues);
+  assert.equal($('change-table').closest('details').open, false);
+  assert.ok($('scatter-table').querySelector('td').dataset.column);
+
   $('lab-metric').value = '4';
   $('lab-metric').dispatchEvent(new w.Event('change', { bubbles: true }));
   assert.equal(

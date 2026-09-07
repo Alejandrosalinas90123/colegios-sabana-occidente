@@ -126,6 +126,9 @@ const SchoolJourney = (() => {
       `${state.journey.departments.length} departamentos habilitados · ${ps.length} municipios incluidos en ${deps.length} departamentos · ${state.years.length} años · ${state.selected.length} colegios elegidos para comparar.${ps.length && ps.length <= 6 ? ' Municipios incluidos: ' + ps.map((p) => p.town + ' (' + p.department + ')').join(', ') + '.' : ''}`;
     $('chosen-places-title').textContent = `Ver y quitar municipios seleccionados (${ps.length})`;
     chosenPlaces();
+    $('inline-places-details').querySelector('summary').textContent =
+      `Municipios añadidos (${ps.length})`;
+    if (ps.length > 6) $('inline-places-details').open = false;
     $('place-selection-inline').innerHTML =
       ps
         .map(
@@ -284,15 +287,20 @@ const SchoolJourney = (() => {
       $('reset').click();
       $('heading-departments').focus();
     };
-    $('department-search').oninput = renderDepartments;
+    $('department-search').oninput = () => {
+      $('department-options').open = Boolean($('department-search').value);
+      renderDepartments();
+    };
     $('chosen-place-search').oninput = chosenPlaces;
     $('next-school-search').onclick = () => {
       $('pick-school-search').value = '';
+      $('school-options').open = false;
       pickerPage = 0;
       picker();
       $('pick-school-search').focus();
     };
     $('pick-school-search').oninput = () => {
+      $('school-options').open = Boolean($('pick-school-search').value);
       pickerPage = 0;
       picker();
     };

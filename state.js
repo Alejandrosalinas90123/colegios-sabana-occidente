@@ -116,6 +116,19 @@ const DashboardState = (() => {
     if (o.chartOptions && typeof o.chartOptions === 'object') {
       const chart = o.chartOptions;
       out.chartOptions = {
+        panel: [
+          'annual',
+          'change',
+          'scatter',
+          'sensitivity',
+          'trend',
+          'subjects',
+          'cohorts',
+          'pairs',
+        ].includes(chart.panel)
+          ? chart.panel
+          : 'annual',
+        scale: chart.scale === 'full' ? 'full' : 'focused',
         metric: ['mean', 'score', 'total', '0', '1', '2', '3', '4'].includes(chart.metric)
           ? chart.metric
           : 'mean',

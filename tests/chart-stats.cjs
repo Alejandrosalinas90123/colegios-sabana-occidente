@@ -65,9 +65,34 @@ const data = {
   state = {
     ...State.defaults([0]),
     selected: [1],
-    chartOptions: { metric: 'mean', year: 2023, from: 2021, to: 2023, strength: 37, highlight: 1 },
+    chartOptions: {
+      panel: 'annual',
+      scale: 'focused',
+      metric: 'mean',
+      year: 2023,
+      from: 2021,
+      to: 2023,
+      strength: 37,
+      highlight: 1,
+    },
   };
 assert.deepEqual(State.decode(State.encode(state), data, State.defaults([0])), state);
 console.log(
   'PASS: annual general mean remains unweighted; missing endpoints; scenario normalization, ties and peer ranks; zero/cohort flags; chart share-state roundtrip.'
 );
+
+for (const values of [
+  [60, 65],
+  [0, 0],
+  [100, 100],
+  [null, 60],
+  [30, 90],
+]) {
+  const bounds = S.domain(values);
+  for (const v of values.filter((v) => v !== null)) assert.ok(bounds.min <= v && bounds.max >= v);
+  assert.ok(bounds.max > bounds.min);
+}
+assert.ok(S.domain([60, 65]).min > 50);
+assert.equal(S.domain([60, 65], 100, true).min, 0);
+assert.equal(S.domain([60, 65], 100, true).max, 100);
+assert.equal(S.domain([null]).max, 100);

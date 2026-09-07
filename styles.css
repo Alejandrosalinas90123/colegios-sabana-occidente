@@ -690,7 +690,7 @@ td small {
   width: 100%;
   height: auto;
   display: block;
-  min-width: 560px;
+  min-width: 0;
 }
 #trend {
   overflow: auto;
@@ -1118,6 +1118,7 @@ dialog form {
   align-items: flex-start;
 }
 .chart-controls label {
+  min-width: 0;
   flex: 1 1 240px;
   font-size: var(--font-label);
   font-weight: 650;
@@ -1143,9 +1144,102 @@ dialog form {
 .lab-svg {
   display: block;
   width: 100%;
-  min-width: 720px;
+  min-width: 0;
   height: auto;
   color: var(--color-text);
+}
+
+/* One working view at a time, with legible charts sized to their container. */
+.comparison-tools > label {
+  display: block;
+  font-weight: 650;
+  margin: 16px 0 8px;
+}
+.comparison-tools select {
+  width: 100%;
+}
+.legend button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  width: 100%;
+  padding: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+}
+.legend button[aria-pressed='true'] {
+  border-color: var(--color-primary);
+  background: var(--color-container);
+}
+.legend button span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.legend .dot {
+  flex-shrink: 0;
+}
+.trend-svg {
+  min-width: 0;
+}
+#chart-lab .card,
+#comparison-content .card {
+  min-width: 0;
+}
+#chart-lab details,
+#comparison-content details {
+  margin: 16px 0;
+}
+#chart-lab #lab-metric-control {
+  padding: 0;
+  margin: 16px 0 0;
+  border: 0;
+  box-shadow: none;
+}
+@media (max-width: 40rem) {
+  #compare-view .table-wrap table,
+  #compare-view .table-wrap tbody,
+  #compare-view .table-wrap tr,
+  #compare-view .table-wrap th,
+  #compare-view .table-wrap td {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  #compare-view .table-wrap thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+  #compare-view .table-wrap tr {
+    margin-bottom: 16px;
+    border: 1px solid var(--color-container);
+  }
+  #compare-view .table-wrap th {
+    position: static;
+    white-space: normal;
+  }
+  #compare-view .table-wrap td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    white-space: normal;
+  }
+  #compare-view .table-wrap td::before {
+    content: attr(data-column);
+    font-weight: 650;
+  }
+  #compare-view .table-wrap {
+    overflow: visible;
+  }
+  .comparison-tools,
+  #chart-lab .card,
+  #comparison-content .card {
+    padding: 16px;
+  }
 }
 .lab-svg text {
   fill: var(--color-text);

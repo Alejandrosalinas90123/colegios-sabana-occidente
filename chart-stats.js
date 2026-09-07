@@ -80,6 +80,23 @@ const ChartStats = (() => {
       missing: rows.reduce((sum, row) => sum + years.filter((year) => !row.byYear[year]).length, 0),
     };
   }
-  return { mean, value, annual, endpoints, blend, ranked, sensitivity, quality };
+  // Shared score domain: no imputation, and padding remains inside the score scale.
+  function domain(values, maximum = 100, full = false) {
+    const valid = values.filter((v) => typeof v === 'number' && Number.isFinite(v));
+    if (full || !valid.length)
+      return {
+        min: 0,
+        max: maximum,
+        ticks: Array.from({ length: 5 }, (_, i) => (maximum * i) / 4),
+      };
+    const low = Math.min(...valid),
+      high = Math.max(...valid);
+    const pad = Math.max(maximum / 100, (high - low) * 0.15);
+    const unit = maximum === 500 ? 5 : 1;
+    const min = Math.max(0, Math.floor((low - pad) / unit) * unit);
+    const max = Math.min(maximum, Math.ceil((high + pad) / unit) * unit);
+    return { min, max, ticks: Array.from({ length: 5 }, (_, i) => min + ((max - min) * i) / 4) };
+  }
+  return { mean, value, annual, endpoints, blend, ranked, sensitivity, quality, domain };
 })();
 if (typeof module !== 'undefined') module.exports = ChartStats;
