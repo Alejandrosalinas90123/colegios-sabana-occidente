@@ -4,6 +4,23 @@ Tablero interactivo de resultados académicos de 2021 a 2025. Sabana de Occident
 
 ## Contenido
 
+### Recorridos guiados
+
+- **Crear mi ranking:** departamentos → municipios y años → prioridades → resultados.
+- **Comparar colegios que conozco:** departamentos → municipios y años → colegios → prioridades → resultados.
+
+Un resumen visible identifica los municipios incluidos por nombre y departamento, permite buscar dentro de la selección y quitar municipios, y muestra los colegios elegidos. Seleccionar un departamento habilita sus municipios, pero no los añade automáticamente. Desmarcarlo elimina sus municipios y anuncia cuántos se quitaron. Los colegios seleccionados que dejan de cumplir los filtros se conservan señalados y no se incorporan a comparaciones incompatibles.
+
+Las preguntas de preferencias son orientativas, creadas para esta aplicación. Las descripciones de las materias se basan en [¿Qué se evalúa en Saber 11? del ICFES](https://www.icfes.gov.co/caja-de-herramientas-saber-11/que-se-evalua/) y en su [guía oficial](https://www.icfes.gov.co/evaluaciones-icfes/saber-11/guia-de-orientacion-examen-saber-11/), consultadas el 7 de septiembre de 2026. Se utiliza Saber 11, correspondiente a colegios, en lugar de Saber Pro, que corresponde a educación superior y tiene componentes diferentes.
+
+Las respuestas de importancia se traducen a pesos relativos 0, 10, 20, 30 y 40. El usuario puede modificarlos directamente entre 0 y 100. Se normalizan dividiendo cada peso por la suma; si todos son cero, la interfaz impide avanzar. Son prioridades del usuario, no coeficientes oficiales del ICFES.
+
+### Comparaciones descriptivas
+
+Además de trayectoria anual, materias y cohortes, se incluye un colegio de referencia seleccionable: diferencia media del indicador en años comunes, número de años por encima y empates. Cada año común pesa igual, independientemente del método de promedio histórico elegido para el ranking; así se evita comparar periodos distintos. Si no existen años comunes, no se calcula la diferencia. Se conservan valores exactos en tablas accesibles.
+
+El contexto municipal muestra la mediana entre los colegios elegibles de cada municipio, dando el mismo peso a cada colegio. No es un promedio de todos sus estudiantes. Estas comparaciones no son pruebas inferenciales: la base agregada no permite evaluar significancia de diferencias entre estudiantes ni efectos causales de los colegios.
+
 - 72.686 registros publicados por GIP, 1.116 municipios en 33 territorios departamentales y 13.448 identidades institucionales por nombre exacto y ubicación.
 - Filtros por municipio, año, naturaleza, jornada, cobertura histórica y mínimo de evaluados.
 - Pesos ajustables por materia y comparación con un escenario de referencia.
@@ -26,6 +43,9 @@ El escenario se expresa sobre 100 puntos. TOTAL suma los cinco puntajes sin peso
 - `ui.js`: validación, conservación/restauración del foco, pestañas con flechas/Home/End, estados de espera y regiones de tablas.
 - `data-loader.js`: descarga con límite de 30 segundos, descompresión y controles de versión/recuento.
 - `engine.js`: cálculos puros. `state.js`: validación y serialización de enlaces. `app.js`: coordinación y presentación.
+- `journey.js`: recorridos, selección visible, preguntas y navegación. `subject-guide.js`: resúmenes y fuentes oficiales. `comparisons.js`: comparaciones descriptivas puras.
+
+Los enlaces nuevos compactan selecciones grandes de municipios en intervalos de identificadores, manteniendo la versión fija de los datos. El decodificador sigue aceptando los enlaces anteriores. El recorrido, los departamentos habilitados y el colegio de referencia también se conservan al compartir.
 
 Los controles tienen una zona objetivo mínima de 48 × 48 px. En casillas, la etiqueta completa amplía el área de pulsación. Los botones distinguen estados normal, hover, active, focus, disabled y loading. Los filtros inválidos muestran texto junto al campo y referencias ARIA; un mínimo de evaluados inválido conserva el último resultado válido, sin corregirlo silenciosamente. Las gráficas incluyen una tabla de valores exactos y no dependen exclusivamente del color.
 

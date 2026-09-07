@@ -72,10 +72,20 @@ function shownPlaces() {
   const q = norm($('place-search').value),
     dep = $('department').value;
   return data.places.filter(
-    (p) => (!dep || p.department === dep) && norm(p.town + ' ' + p.department).includes(q)
+    (p) =>
+      (!state.journey || state.journey.departments.includes(p.department)) &&
+      (!dep || p.department === dep) &&
+      norm(p.town + ' ' + p.department).includes(q)
   );
 }
 function renderPlaces() {
+  if (state.journey) {
+    const current = $('department').value;
+    $('department').innerHTML =
+      '<option value="">Todos los departamentos elegidos</option>' +
+      state.journey.departments.map((dep) => `<option>${esc(dep)}</option>`).join('');
+    $('department').value = state.journey.departments.includes(current) ? current : '';
+  }
   const selected = new Set(state.places);
   $('places').innerHTML =
     shownPlaces()
@@ -87,6 +97,7 @@ function renderPlaces() {
   $('place-count').textContent = `${fmt(state.places.length, 0)} municipios seleccionados`;
 }
 function syncControls() {
+  SchoolJourney.ensure();
   $('years').innerHTML = data.years
     .map(
       (y) =>
@@ -170,6 +181,7 @@ function render() {
   announce(
     result.error || `${fmt(result.rows.length, 0)} colegios disponibles con los filtros actuales.`
   );
+  SchoolJourney.refresh();
   DashboardUI.labelTables();
   save();
   DashboardUI.restoreFocus(focus);
@@ -432,6 +444,7 @@ function bind() {
     if (!Number.isInteger(i)) return;
     state.weights[i] = Number(e.target.value);
     renderWeights();
+    SchoolJourney.indicator();
     validateFilters();
     clearTimeout(renderTimer);
     renderTimer = setTimeout(() => change({ weights: state.weights }), 80);
@@ -596,11 +609,11 @@ async function start() {
       .join('');
     $('compare-metric').innerHTML = $('metric').innerHTML;
     bind();
+    SchoolJourney.initialize(Boolean(location.hash && location.hash !== '#main'));
     syncControls();
     $('app').hidden = false;
     $('share').disabled = false;
-    if (matchMedia('(max-width:720px)').matches)
-      document.querySelectorAll('.filter-section').forEach((d) => (d.open = false));
+    // Steps keep their essential controls expanded at every screen size.
     render();
     if (linkError) announce(linkError);
     $('loading').hidden = true;
@@ -619,7 +632,7 @@ async function start() {
 }
 $('retry').onclick = () =>
   DashboardUI.busy($('retry'), 'Cargando…', start).then(() => {
-    if (!$('app').hidden) $('explore-tab').focus();
+    if (!$('app').hidden) $('heading-' + state.journey.step).focus();
     else $('retry').focus();
   });
 start();

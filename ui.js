@@ -26,7 +26,18 @@ const DashboardUI = (() => {
     if (!element || element === document.body) return null;
     const region = element.closest('[id]')?.id;
     if (element.id) return { element, selector: '#' + CSS.escape(element.id) };
-    for (const attribute of ['data-add', 'data-remove', 'data-detail', 'data-year', 'data-place']) {
+    for (const attribute of [
+      'data-add',
+      'data-remove',
+      'data-detail',
+      'data-year',
+      'data-place',
+      'data-department',
+      'data-pick',
+      'data-remove-place',
+      'data-route',
+      'data-goto',
+    ]) {
       if (element.hasAttribute(attribute)) {
         const selector = `[${attribute}="${CSS.escape(element.getAttribute(attribute))}"]`;
         return { element, selector, region };
@@ -41,7 +52,10 @@ const DashboardUI = (() => {
     const replacement =
       snapshot.selector &&
       (region?.querySelector(snapshot.selector) || document.querySelector(snapshot.selector));
-    const target = replacement && !replacement.closest('[hidden]') ? replacement : byId(fallbackId);
+    let target = replacement && !replacement.closest('[hidden]') ? replacement : byId(fallbackId);
+    // A result tab may be hidden while the user is editing a wizard step.
+    if (!target || target.closest('[hidden]'))
+      target = document.querySelector('[aria-current="step"]');
     target?.focus({ preventScroll: true });
   }
 

@@ -47,7 +47,16 @@ async function mount(failFirst = false) {
   const errors = [];
   w.addEventListener('error', (e) => errors.push(e.error));
   w.eval(
-    ['engine.js', 'state.js', 'data-loader.js', 'ui.js', 'app.js']
+    [
+      'engine.js',
+      'state.js',
+      'data-loader.js',
+      'ui.js',
+      'subject-guide.js',
+      'comparisons.js',
+      'journey.js',
+      'app.js',
+    ]
       .map((file) => fs.readFileSync(root + '/' + file, 'utf8'))
       .join('\n')
   );
@@ -80,6 +89,63 @@ function contrast(a, b) {
   assert.equal(UI.tabDestination('End', 0), 1);
   assert.equal(UI.tabDestination('Tab', 0), undefined);
   const { dom, w, $, errors } = await mount();
+  assert.equal($('load-error').hidden, true, $('load-error-message').textContent);
+  assert.equal($('step-departments').hidden, false);
+  assert.equal($('main').hidden, true);
+  assert.match($('journey-summary').textContent, /4 municipios incluidos/);
+  assert.equal($('chosen-places').querySelectorAll('[data-remove-place]').length, 4);
+  $('national').click();
+  assert.equal($('chosen-places').querySelectorAll('[data-remove-place]').length, 1116);
+  assert.ok(w.location.hash.length < 3000, 'National share URL should use compact ranges');
+  $('journey-reset').click();
+  const cundi = $('departments-list').querySelector('[data-department="CUNDINAMARCA"]');
+  cundi.checked = false;
+  cundi.dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.equal($('chosen-places').querySelectorAll('[data-remove-place]').length, 0);
+  const antioquia = $('departments-list').querySelector('[data-department="ANTIOQUIA"]');
+  antioquia.checked = true;
+  antioquia.dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.equal(
+    $('chosen-places').querySelectorAll('[data-remove-place]').length,
+    0,
+    'Department selection must not add municipalities'
+  );
+  $('journey-next').click();
+  assert.equal($('step-places').hidden, false);
+  $('journey-next').click();
+  assert.equal($('step-places').hidden, false);
+  assert.equal($('step-error').hidden, false);
+  const municipality = $('places').querySelector('[data-place]');
+  municipality.checked = true;
+  municipality.dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.equal($('chosen-places').querySelectorAll('[data-remove-place]').length, 1);
+  $('journey-reset').click();
+  w.document.querySelector('[data-route=compare]').click();
+  $('journey-next').click();
+  $('journey-next').click();
+  assert.equal($('step-schools').hidden, false);
+  const schoolIds = [...$('school-picker').querySelectorAll('[data-pick]:not(:disabled)')]
+    .slice(0, 2)
+    .map((el) => el.dataset.pick);
+  for (const id of schoolIds) $('school-picker').querySelector(`[data-pick="${id}"]`).click();
+  assert.equal($('chosen-schools').querySelectorAll('[data-remove]').length, 2);
+  $('journey-next').click();
+  assert.equal($('step-priorities').hidden, false);
+  const english = $('importance-4');
+  english.value = '4';
+  english.dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.equal($('weight-4').value, '40');
+  assert.match($('indicator-preview').textContent, /33,3/);
+  $('journey-next').click();
+  assert.equal($('main').hidden, false);
+  assert.equal($('compare-view').hidden, false);
+  assert.equal($('pair-table').querySelectorAll('tbody tr').length, 1);
+  assert.ok($('pair-table').textContent.includes('2021'));
+  // Return to the original regional defaults for the existing interaction regression.
+  $('journey-reset').click();
+  $('journey-next').click();
+  $('journey-next').click();
+  $('journey-next').click();
   assert.equal($('loading').hidden, true);
   assert.equal($('ranking').rows.length, 20);
   assert.match($('stats').textContent, /66/);
@@ -191,6 +257,11 @@ function contrast(a, b) {
     passed: true,
     domChecks: [
       'initial load',
+      'department to municipality hierarchy',
+      'visible 1116 municipality selection',
+      'guided ranking and comparison paths',
+      'importance guide weights',
+      'common-year comparison table',
       'tab arrows and roving tabindex',
       'focus after list replacement',
       'dialog focus return',

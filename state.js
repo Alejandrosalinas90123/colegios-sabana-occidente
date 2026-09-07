@@ -15,11 +15,40 @@ const DashboardState = (() => {
     metric: 'score',
     search: '',
   });
-  const encode = (state) => '#' + encodeURIComponent(JSON.stringify(state));
+  // Compact large territorial selections without a server or a URL shortener.
+  const encode = (state) => {
+    const packed = { ...state };
+    if (state.places.length > 20) {
+      const ids = [...new Set(state.places)].sort((a, b) => a - b),
+        ranges = [];
+      for (let i = 0; i < ids.length; i++) {
+        const first = ids[i];
+        let last = first;
+        while (ids[i + 1] === last + 1) last = ids[++i];
+        ranges.push(first === last ? String(first) : `${first}-${last}`);
+      }
+      packed.placeRanges = ranges.join(',');
+      delete packed.places;
+    }
+    return '#' + encodeURIComponent(JSON.stringify(packed));
+  };
   function decode(hash, data, fallback) {
     if (!hash || hash === '#') return JSON.parse(JSON.stringify(fallback));
     const o = JSON.parse(decodeURIComponent(hash.slice(1)));
     if (o.v !== 2) throw new Error('Versión de enlace no compatible.');
+    if (o.places === undefined && typeof o.placeRanges === 'string') {
+      const ids = [];
+      if (o.placeRanges.length > 16000) throw new Error('Selección territorial demasiado larga.');
+      for (const range of o.placeRanges.split(',')) {
+        if (!/^\d+(?:-\d+)?$/.test(range)) throw new Error('Selección territorial no válida.');
+        const [first, last = first] = range.split('-').map(Number);
+        if (first > last || last >= data.places.length)
+          throw new Error('Selección territorial fuera de la base.');
+        for (let id = first; id <= last; id++) ids.push(id);
+        if (ids.length > data.places.length) throw new Error('Selección territorial repetida.');
+      }
+      o.places = ids;
+    }
     const valid = (a, values) => Array.isArray(a) && a.every((x) => values.has(x));
     if (
       !valid(o.places, new Set(data.places.map((p) => p.id))) ||
@@ -66,6 +95,24 @@ const DashboardState = (() => {
       ? Math.max(0, Math.min(100000, Math.floor(o.minStudents)))
       : 0;
     out.search = typeof o.search === 'string' ? o.search.slice(0, 200) : '';
+    if (o.journey && typeof o.journey === 'object') {
+      const departments = new Set(data.places.map((p) => p.department));
+      if (!valid(o.journey.departments, departments))
+        throw new Error('Departamento no válido en el enlace.');
+      out.journey = {
+        mode: o.journey.mode === 'compare' ? 'compare' : 'rank',
+        step: ['departments', 'places', 'schools', 'priorities', 'results'].includes(o.journey.step)
+          ? o.journey.step
+          : 'departments',
+        departments: [
+          ...new Set([
+            ...o.journey.departments,
+            ...out.places.map((id) => data.places.find((p) => p.id === id).department),
+          ]),
+        ],
+        baseline: out.selected.includes(o.journey.baseline) ? o.journey.baseline : null,
+      };
+    }
     return out;
   }
   return { defaults, encode, decode };

@@ -9,7 +9,7 @@
       content="Compara resultados históricos Saber 11 de colegios: municipios de Colombia, materias, estudiantes y escenarios de pesos."
     />
     <title>Atlas de colegios · Saber 11</title>
-    <link rel="stylesheet" href="styles.css?v=3" />
+    <link rel="stylesheet" href="styles.css?v=4" />
   </head>
   <body>
     <a class="skip" href="#main">Ir a los resultados</a>
@@ -21,14 +21,14 @@
           <span>RESULTADOS SABER 11 · 2021–2025</span>
         </div>
       </div>
-      <button id="share" class="secondary-inverse" disabled>Compartir selección ↗</button>
+      <button id="share" class="secondary-inverse" disabled="">Compartir selección ↗</button>
     </header>
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <h1 id="page-title">Compara colegios con perspectiva</h1>
+        <h1 id="page-title">Una búsqueda a tu medida, paso a paso</h1>
         <p>
-          Resultados Saber 11 · 2021–2025 · 1.116 municipios. Elige territorios, ajusta tus
-          prioridades y compara hasta seis colegios.
+          Define dónde buscar, qué materias valorar y qué colegios comparar. Datos verificados de
+          2021 a 2025.
         </p>
       </div>
     </section>
@@ -38,23 +38,78 @@
       <h2 id="loading-title">Cargando la base verificada</h2>
       <p>Preparando 72.686 registros. Esto puede tardar unos segundos.</p>
     </section>
-    <div id="load-error" class="load-error" hidden>
+    <div id="load-error" class="load-error" hidden="">
       <p id="load-error-message" role="alert"></p>
       <button id="retry" class="primary">Reintentar carga</button>
     </div>
-    <div id="app" class="layout" hidden>
-      <aside class="filters" aria-label="Filtros del tablero">
-        <div class="filter-head">
-          <h2>Tu búsqueda</h2>
-          <button id="reset" class="text-button">Restablecer</button>
+    <div id="app" class="journey-layout" hidden="">
+      <div class="journey-shell">
+        <div class="route-head">
+          <h2>¿Qué quieres hacer?</h2>
+          <button id="journey-reset" class="text-button">Volver a Sabana de Occidente</button>
         </div>
-        <details open class="filter-section">
-          <summary>01 / Dónde buscar</summary>
+        <div class="route-options" role="group" aria-label="Recorrido">
+          <button data-route="rank" aria-pressed="true">
+            <strong>Crear mi ranking</strong
+            ><span>Define prioridades y descubre colegios.</span></button
+          ><button data-route="compare" aria-pressed="false">
+            <strong>Comparar colegios que conozco</strong
+            ><span>Escoge colegios y revisa su trayectoria.</span>
+          </button>
+        </div>
+        <nav id="journey-nav" aria-label="Pasos de la búsqueda"></nav>
+        <section class="selection-summary" aria-labelledby="summary-heading">
+          <div class="between">
+            <h2 id="summary-heading">Esto está incluido en tu búsqueda</h2>
+            <button data-goto="places">Editar municipios</button>
+          </div>
+          <p id="journey-summary"></p>
+          <details id="chosen-places-details">
+            <summary id="chosen-places-title">Ver municipios seleccionados</summary>
+            <label for="chosen-place-search">Buscar entre los seleccionados</label
+            ><input id="chosen-place-search" type="search" placeholder="Municipio o departamento" />
+            <div id="chosen-places"></div>
+          </details>
+          <div id="chosen-schools"></div>
+        </section>
+        <button id="reset" class="text-button" hidden="">Restablecer</button>
+      </div>
+      <section id="step-departments" class="journey-panel" aria-labelledby="heading-departments">
+        <h2 id="heading-departments" tabindex="-1">1. Elige los departamentos</h2>
+        <p>
+          Elegir un departamento habilita sus municipios en el siguiente paso; no los añade
+          automáticamente. Si lo desmarcas, se quitarán sus municipios de la búsqueda.
+        </p>
+        <div id="territory-presets">
           <div class="presets">
             <button id="sabana">Sabana de Occidente</button>
             <button id="national">Todo el país</button>
           </div>
-          <label for="department">Departamento <small>para buscar municipios</small> </label>
+        </div>
+        <label for="department-search">Buscar departamento</label
+        ><input id="department-search" type="search" placeholder="Ej. Cundinamarca" />
+        <div class="between">
+          <span id="department-count"></span
+          ><button id="all-departments">Seleccionar todos los departamentos</button>
+        </div>
+        <div
+          id="departments-list"
+          class="department-grid"
+          role="group"
+          aria-label="Departamentos"
+        ></div>
+        <p id="departments-error" class="field-error" hidden=""></p>
+      </section>
+      <section id="step-places" class="journey-panel" aria-labelledby="heading-places" hidden="">
+        <h2 id="heading-places" tabindex="-1">Elige los municipios y los años</h2>
+        <p>
+          Marca los municipios que quieres incluir. Revisa sus nombres en el resumen de selección,
+          aunque cambies de departamento o de búsqueda.
+        </p>
+        <details open="" class="filter-section">
+          <summary>Municipios disponibles</summary>
+
+          <label for="department">Filtrar la lista por departamento</label>
           <select id="department">
             <option value="">Todos los departamentos</option>
           </select>
@@ -72,13 +127,13 @@
             aria-label="Municipios disponibles"
             aria-describedby="places-error"
           ></div>
-          <p id="places-error" class="field-error" role="status" hidden></p>
+          <p id="places-error" class="field-error" role="status" hidden=""></p>
           <small
-            >Se pueden combinar municipios de varios departamentos. Cambiar el departamento solo
-            filtra esta lista.</small
+            >Los municipios marcados se conservan al buscar otros nombres. El resumen superior
+            muestra la selección efectiva.</small
           >
         </details>
-        <details open class="filter-section">
+        <details open="" class="filter-section">
           <summary>02 / Qué años comparar</summary>
           <div
             id="years"
@@ -87,13 +142,13 @@
             aria-label="Años que se incluyen en la comparación"
             aria-describedby="years-error"
           ></div>
-          <p id="years-error" class="field-error" role="status" hidden></p>
+          <p id="years-error" class="field-error" role="status" hidden=""></p>
           <label class="check">
-            <input id="complete" type="checkbox" checked /> Exigir datos en todos los años
+            <input id="complete" type="checkbox" checked="" /> Exigir datos en todos los años
             elegidos</label
           >
         </details>
-        <details class="filter-section">
+        <details class="filter-section" open="">
           <summary>03 / Afinar los resultados</summary>
           <label for="nature">Sector</label>
           <select id="nature">
@@ -124,14 +179,31 @@
             aria-describedby="minimum-hint minimum-error"
           />
           <p id="minimum-hint" class="hint">Usa 0 para incluir cualquier tamaño de cohorte.</p>
-          <p id="minimum-error" class="field-error" role="status" hidden></p>
+          <p id="minimum-error" class="field-error" role="status" hidden=""></p>
           <label for="aggregation">Promedio histórico</label>
           <select id="aggregation">
             <option value="equal">Cada año pesa lo mismo</option>
             <option value="students">Ponderar por evaluados</option>
           </select>
         </details>
-        <details open class="filter-section">
+      </section>
+      <section
+        id="step-priorities"
+        class="journey-panel"
+        aria-labelledby="heading-priorities"
+        hidden=""
+      >
+        <h2 id="heading-priorities" tabindex="-1">¿Qué materias son más importantes para ti?</h2>
+        <p>
+          Puedes responder una pregunta por materia o mover directamente sus pesos. No hay una
+          respuesta correcta: este indicador refleja tus prioridades.
+        </p>
+        <p class="hint">
+          Esta guía trata de <strong>Saber 11</strong>, el examen de los colegios. Saber Pro evalúa
+          educación superior y tiene otros componentes.
+        </p>
+        <div id="indicator-preview" class="card" aria-live="polite"></div>
+        <details open="" class="filter-section">
           <summary>04 / Tus prioridades</summary>
           <p class="hint">Mueve los controles. Los porcentajes se ajustan para sumar 100 %.</p>
           <div
@@ -140,7 +212,7 @@
             aria-label="Pesos de las cinco materias"
             aria-describedby="weights-error"
           ></div>
-          <p id="weights-error" class="field-error" role="status" hidden></p>
+          <p id="weights-error" class="field-error" role="status" hidden=""></p>
           <div class="presets">
             <button data-preset="equal">Equilibrado</button>
             <button data-preset="english">Más inglés</button>
@@ -153,8 +225,44 @@
             filtros.</small
           >
         </details>
-      </aside>
-      <main id="main" tabindex="-1">
+        <p class="hint">
+          Descripciones resumidas de la
+          <a
+            href="https://www.icfes.gov.co/caja-de-herramientas-saber-11/que-se-evalua/"
+            target="_blank"
+            rel="noopener"
+            >información oficial del ICFES sobre Saber 11</a
+          >. Las preguntas de preferencias son una ayuda de esta aplicación, no un cuestionario del
+          ICFES.
+        </p>
+      </section>
+      <section id="step-schools" class="journey-panel" aria-labelledby="heading-schools" hidden="">
+        <h2 id="heading-schools" tabindex="-1">Escoge los colegios que quieres comparar</h2>
+        <p>
+          Selecciona entre 2 y 6 colegios. Puedes combinar municipios. Los colegios sin resultados
+          suficientes aparecen señalados; revisa años y filtros para incluirlos.
+        </p>
+        <button data-goto="places">Cambiar municipios, años o filtros</button
+        ><label for="pick-school-search">Buscar colegio por nombre o municipio</label
+        ><input id="pick-school-search" type="search" placeholder="Ej. nombre del colegio" />
+        <p id="picker-count" role="status"></p>
+        <div id="school-picker" class="school-picker"></div>
+        <div class="pagination">
+          <button id="picker-prev">Anterior</button><span id="picker-page"></span
+          ><button id="picker-next">Siguiente</button>
+        </div>
+        <p id="schools-error" class="field-error" hidden=""></p>
+      </section>
+      <main id="main" tabindex="-1" class="journey-results" data-journey-panel="results" hidden="">
+        <div>
+          <h2 id="heading-results" tabindex="-1">Tus resultados</h2>
+          <div class="presets">
+            <button data-goto="priorities">Cambiar mis prioridades</button
+            ><button data-goto="places">Cambiar territorios y años</button
+            ><button id="choose-more-schools">Elegir colegios para comparar</button>
+          </div>
+          <div id="results-indicator" class="card"></div>
+        </div>
         <div class="tabs" role="tablist" aria-label="Vistas del tablero">
           <button
             id="explore-tab"
@@ -177,7 +285,7 @@
         </div>
         <div id="scope" class="scope"></div>
         <div id="stats" class="stats"></div>
-        <div id="selection" class="selection"></div>
+        <div id="selection" class="selection" hidden></div>
         <section id="explore-view" role="tabpanel" aria-labelledby="explore-tab" tabindex="0">
           <div class="section-title">
             <div>
@@ -241,13 +349,27 @@
             <span id="page"> </span>
             <button id="next">Siguiente →</button>
           </div>
+          <details class="card">
+            <summary>Contexto de los municipios seleccionados</summary>
+            <p>
+              Mediana del indicador entre los colegios que cumplen tus filtros en cada municipio.
+              Cada colegio pesa lo mismo; no es el promedio de todos los estudiantes del municipio.
+              Este contexto no se restringe por la búsqueda de nombre ni por los colegios marcados
+              para comparar.
+            </p>
+            <div
+              id="municipality-context"
+              class="table-wrap"
+              data-label="Contexto descriptivo por municipio"
+            ></div>
+          </details>
         </section>
         <section
           id="compare-view"
           role="tabpanel"
           aria-labelledby="compare-tab"
           tabindex="0"
-          hidden
+          hidden=""
         >
           <div class="section-title">
             <div>
@@ -256,7 +378,7 @@
             </div>
             <label>Ver resultados por<select id="compare-metric"></select> </label>
           </div>
-          <p id="compare-empty" class="empty" hidden>
+          <p id="compare-empty" class="empty" hidden="">
             Añade colegios desde «Explorar colegios» para comparar su evolución, materias y número
             de evaluados.
           </p>
@@ -299,6 +421,26 @@
               </p>
               <div id="cohorts"></div>
             </div>
+            <section class="card">
+              <h3>Comparación directa en años comunes</h3>
+              <p>
+                Compara cada colegio con uno de referencia. La diferencia usa únicamente los años
+                con datos en ambos; cada año común pesa lo mismo.
+              </p>
+              <label for="baseline-school">Colegio de referencia</label
+              ><select id="baseline-school"></select>
+              <div id="pair-chart" class="ranking-chart"></div>
+              <div
+                id="pair-table"
+                class="table-wrap"
+                data-label="Comparaciones entre colegios en años comunes"
+              ></div>
+              <p class="hint">
+                Son diferencias descriptivas de promedios, no pruebas de significancia estadística
+                ni medidas del efecto del colegio. La base no permite seguir a los mismos
+                estudiantes entre años.
+              </p>
+            </section>
           </div>
         </section>
         <details class="card data-detail">
@@ -356,6 +498,13 @@
           municipios de Colombia.
         </footer>
       </main>
+      <div class="journey-actions">
+        <p id="step-error" class="field-error" role="alert" hidden=""></p>
+        <div class="between">
+          <button id="journey-back">← Atrás</button><span id="step-position"></span
+          ><button id="journey-next" class="primary">Continuar →</button>
+        </div>
+      </div>
     </div>
     <dialog id="school-dialog" aria-labelledby="dialog-title">
       <form method="dialog">
@@ -363,10 +512,13 @@
       </form>
       <div id="school-detail"></div>
     </dialog>
-    <script src="engine.js?v=2"></script>
-    <script src="state.js?v=2"></script>
+    <script src="engine.js?v=4"></script>
+    <script src="state.js?v=4"></script>
     <script src="data-loader.js?v=3"></script>
-    <script src="ui.js?v=3"></script>
-    <script src="app.js?v=3"></script>
+    <script src="ui.js?v=4"></script>
+    <script src="subject-guide.js?v=4"></script>
+    <script src="comparisons.js?v=4"></script>
+    <script src="journey.js?v=4"></script>
+    <script src="app.js?v=4"></script>
   </body>
 </html>
