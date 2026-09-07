@@ -1,0 +1,21 @@
+{
+  "version": 2,
+  "records": 72686,
+  "schools": 13448,
+  "municipalities": 1116,
+  "departments": 33,
+  "years": {
+    "2021": 14340,
+    "2022": 14400,
+    "2023": 14569,
+    "2024": 14612,
+    "2025": 14765
+  },
+  "zeroEvaluated": 0,
+  "source": "https://www.gip.com.co/gipdata/icfes",
+  "workbook": "versión verificada 2.xlsx",
+  "sourceSha256": "ffd3937f9a4822b0e7a2920de2b8122ec0e589f1e0595a8f46dec88432bbc8a7",
+  "dataSha256": "38e3bc2121405e309a3d51c8b23682e0b1b42209b335f0c7f625e9045c282788",
+  "gzipSha256": "d9442a966b92deb299c58e520e56a1c6419b3bf60cae0d000509261637a55c5f",
+  "verification": "Every record, location, year, subject score, evaluated count, nature, session and calendar matches datos.json. Source row IDs are unique; gzip round trip is exact."
+}
