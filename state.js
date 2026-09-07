@@ -113,6 +113,21 @@ const DashboardState = (() => {
         baseline: out.selected.includes(o.journey.baseline) ? o.journey.baseline : null,
       };
     }
+    if (o.chartOptions && typeof o.chartOptions === 'object') {
+      const chart = o.chartOptions;
+      out.chartOptions = {
+        metric: ['mean', 'score', 'total', '0', '1', '2', '3', '4'].includes(chart.metric)
+          ? chart.metric
+          : 'mean',
+        year: out.years.includes(chart.year) ? chart.year : (out.years.at(-1) ?? 2025),
+        from: out.years.includes(chart.from) ? chart.from : (out.years[0] ?? 2021),
+        to: out.years.includes(chart.to) ? chart.to : (out.years.at(-1) ?? 2025),
+        strength: Number.isFinite(chart.strength)
+          ? Math.max(0, Math.min(100, chart.strength))
+          : 100,
+        highlight: out.selected.includes(chart.highlight) ? chart.highlight : null,
+      };
+    }
     return out;
   }
   return { defaults, encode, decode };

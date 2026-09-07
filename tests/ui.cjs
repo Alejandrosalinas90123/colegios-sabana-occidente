@@ -55,6 +55,8 @@ async function mount(failFirst = false) {
       'subject-guide.js',
       'comparisons.js',
       'journey.js',
+      'chart-stats.js',
+      'chart-lab.js',
       'app.js',
     ]
       .map((file) => fs.readFileSync(root + '/' + file, 'utf8'))
@@ -141,6 +143,39 @@ function contrast(a, b) {
   assert.equal($('compare-view').hidden, false);
   assert.equal($('pair-table').querySelectorAll('tbody tr').length, 1);
   assert.ok($('pair-table').textContent.includes('2021'));
+  assert.equal($('mean-table').querySelectorAll('tbody tr').length, 2);
+  const fixedAnnualValues = $('mean-table').textContent;
+  $('lab-metric').value = '4';
+  $('lab-metric').dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.equal(
+    $('mean-table').textContent,
+    fixedAnnualValues,
+    'Selecting English must not replace the general annual chart'
+  );
+  assert.match($('change-description').textContent, /Inglés/);
+  $('lab-year').value = '2021';
+  $('lab-year').dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.ok($('scatter-table').textContent.includes('2021'));
+  const point = $('mean-chart').querySelector('[data-chart-point]');
+  const pointedId = point.dataset.chartPoint;
+  point.dispatchEvent(new w.MouseEvent('click', { bubbles: true }));
+  assert.equal($('chart-highlight').value, pointedId);
+  assert.match($('chart-point-readout').textContent, /promedio general/);
+  $('scenario-strength').value = '0';
+  $('scenario-strength').dispatchEvent(new w.Event('input', { bubbles: true }));
+  assert.equal($('scenario-percent').textContent, '0 %');
+  $('apply-chart-scenario').click();
+  assert.equal($('weight-4').value, '20');
+  assert.equal(
+    $('mean-table').textContent,
+    fixedAnnualValues,
+    'Applying different weights must leave annual general means unchanged'
+  );
+  assert.equal($('sensitivity-table').querySelectorAll('tbody tr').length, 2);
+  $('lab-from').value = '2025';
+  $('lab-to').value = '2021';
+  $('lab-to').dispatchEvent(new w.Event('change', { bubbles: true }));
+  assert.match($('change-chart').textContent, /Se necesitan dos años/);
   // Return to the original regional defaults for the existing interaction regression.
   $('journey-reset').click();
   $('journey-next').click();
@@ -257,6 +292,9 @@ function contrast(a, b) {
     passed: true,
     domChecks: [
       'initial load',
+      'general annual chart invariant under metric and weight changes',
+      'chart point selection, year control and invalid endpoint interval',
+      'weight scenario exploration and application',
       'department to municipality hierarchy',
       'visible 1116 municipality selection',
       'guided ranking and comparison paths',

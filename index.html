@@ -9,7 +9,7 @@
       content="Compara resultados históricos Saber 11 de colegios: municipios de Colombia, materias, estudiantes y escenarios de pesos."
     />
     <title>Atlas de colegios · Saber 11</title>
-    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="styles.css?v=5" />
   </head>
   <body>
     <a class="skip" href="#main">Ir a los resultados</a>
@@ -285,7 +285,7 @@
         </div>
         <div id="scope" class="scope"></div>
         <div id="stats" class="stats"></div>
-        <div id="selection" class="selection" hidden></div>
+        <div id="selection" class="selection" hidden=""></div>
         <section id="explore-view" role="tabpanel" aria-labelledby="explore-tab" tabindex="0">
           <div class="section-title">
             <div>
@@ -382,6 +382,183 @@
             Añade colegios desde «Explorar colegios» para comparar su evolución, materias y número
             de evaluados.
           </p>
+          <section id="chart-lab" class="chart-lab">
+            <div class="section-title">
+              <div>
+                <span class="eyebrow">LABORATORIO DE COMPARACIONES</span>
+                <h2>Una mirada distinta a los mismos colegios</h2>
+              </div>
+            </div>
+            <nav class="presets" aria-label="Gráficas comparativas">
+              <button data-chart-goto="annual-mean-title">Promedio anual</button
+              ><button data-chart-goto="chart-change-title">Cambio entre años</button
+              ><button data-chart-goto="chart-scatter-title">Puntaje y evaluados</button
+              ><button data-chart-goto="chart-sensitivity-title">Sensibilidad a pesos</button>
+            </nav>
+            <div id="chart-quality" class="card"></div>
+            <p id="chart-empty" class="empty" hidden="">
+              Elige colegios con resultados que cumplan tus filtros. Los colegios excluidos siguen
+              visibles en el resumen de selección.
+            </p>
+            <div id="chart-panels">
+              <section class="card" aria-labelledby="annual-mean-title">
+                <h3 id="annual-mean-title" tabindex="-1">Promedio general por colegio y año</h3>
+                <p>
+                  Promedio simple de las cinco materias, de 0 a 100. Esta gráfica permanece
+                  independiente de tus pesos y de la materia que explores abajo. No es el puntaje
+                  global oficial del ICFES. Dentro de cada año, las jornadas elegidas se combinan
+                  ponderando por evaluados antes de promediar las cinco materias.
+                </p>
+                <div class="chart-controls">
+                  <label>Resaltar o consultar colegio<select id="chart-highlight"></select></label
+                  ><label>Consultar año<select id="chart-inspect-year"></select></label>
+                </div>
+                <p
+                  id="chart-point-readout"
+                  class="chart-readout"
+                  role="status"
+                  aria-live="polite"
+                ></p>
+                <div id="mean-legend" class="legend"></div>
+                <div
+                  id="mean-chart"
+                  class="chart-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label="Promedio general anual; valores accesibles en la tabla siguiente"
+                ></div>
+                <p class="hint">
+                  Pasa el cursor o toca un punto para consultar su valor. Con teclado, usa los
+                  selectores anteriores. Las líneas se interrumpen si falta un año; no se estiman
+                  datos.
+                </p>
+                <details>
+                  <summary>Valores del promedio general anual</summary>
+                  <div
+                    id="mean-table"
+                    class="table-wrap"
+                    data-label="Promedio general de cada colegio en cada año"
+                  ></div>
+                </details>
+              </section>
+              <div class="chart-controls card">
+                <label
+                  >Materia o indicador para las siguientes comparaciones<select id="lab-metric">
+                    <option value="mean">Promedio general /100</option>
+                    <option value="score">Mis pesos /100</option>
+                    <option value="total">TOTAL /500</option>
+                    <option value="0">Lectura crítica</option>
+                    <option value="1">Matemáticas</option>
+                    <option value="2">Sociales y ciudadanas</option>
+                    <option value="3">Ciencias naturales</option>
+                    <option value="4">Inglés</option>
+                  </select></label
+                >
+                <p class="hint">
+                  Cambiar esta opción actualiza el cambio entre años y el gráfico de puntaje frente
+                  a evaluados. La evolución del promedio general de arriba se conserva.
+                </p>
+              </div>
+              <section class="card">
+                <h3 id="chart-change-title" tabindex="-1">¿Cuánto cambió entre dos años?</h3>
+                <div class="chart-controls">
+                  <label>Desde<select id="lab-from"></select></label
+                  ><label>Hasta<select id="lab-to"></select></label>
+                </div>
+                <p id="change-description"></p>
+                <div
+                  id="change-chart"
+                  class="chart-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label="Cambio entre dos años, con valores en la tabla"
+                ></div>
+                <div
+                  id="change-table"
+                  class="table-wrap"
+                  data-label="Valores iniciales, finales y cambio en puntos"
+                ></div>
+                <p class="hint">
+                  Compara cohortes distintas. Un aumento no demuestra que el colegio haya causado
+                  esa mejora. Si falta alguno de los dos años, no se calcula el cambio.
+                </p>
+              </section>
+              <section class="card">
+                <h3 id="chart-scatter-title" tabindex="-1">Puntaje y número de evaluados</h3>
+                <label for="lab-year">Año de la comparación</label
+                ><select id="lab-year"></select>
+                <div
+                  id="cohort-scatter"
+                  class="chart-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label="Puntaje frente a evaluados; valores en la tabla siguiente"
+                ></div>
+                <div
+                  id="scatter-table"
+                  class="table-wrap"
+                  data-label="Puntaje y evaluados por colegio"
+                ></div>
+                <p class="hint">
+                  Cada punto es un colegio en ese año; todos los puntos tienen el mismo tamaño.
+                  Pueden superponerse: usa Resaltar colegio o la tabla para distinguirlos. El número
+                  de evaluados no explica por sí solo el puntaje y no representa la matrícula total.
+                </p>
+              </section>
+              <section class="card">
+                <h3 id="chart-sensitivity-title" tabindex="-1">
+                  ¿Cambia la posición si cambian tus prioridades?
+                </h3>
+                <p>
+                  Explora el recorrido desde pesos iguales hasta tus pesos actuales. El conjunto de
+                  colegios y los filtros se mantienen constantes.
+                </p>
+                <label for="scenario-strength"
+                  >Mezcla entre pesos iguales y tus prioridades
+                  <output id="scenario-percent" for="scenario-strength">100 %</output></label
+                ><input
+                  id="scenario-strength"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="100"
+                  aria-describedby="scenario-help"
+                />
+                <p id="scenario-help" class="hint">
+                  0 % = las cinco materias pesan igual. 100 % = tus pesos actuales. Es una mezcla de
+                  escenarios, no un nivel de confianza.
+                </p>
+                <div id="scenario-weights" class="weight-breakdown"></div>
+                <div
+                  id="sensitivity-chart"
+                  class="chart-scroll"
+                  tabindex="0"
+                  role="region"
+                  aria-label="Posiciones según cinco escenarios; valores en la tabla"
+                ></div>
+                <div
+                  id="sensitivity-table"
+                  class="table-wrap"
+                  data-label="Posición y puntaje en el escenario explorado"
+                ></div>
+                <div class="presets">
+                  <button id="apply-chart-scenario" class="primary">
+                    Aplicar este escenario al ranking</button
+                  ><button data-goto="priorities">Modificar mis pesos de destino</button>
+                </div>
+                <p id="sensitivity-description" class="hint"></p>
+              </section>
+              <p class="hint">
+                Inspiración visual:
+                <a href="https://python-graph-gallery.com/" target="_blank" rel="noopener"
+                  >Python Graph Gallery</a
+                >
+                — líneas, puntos y segmentos. Implementación interactiva propia en JavaScript, con
+                los datos verificados del tablero.
+              </p>
+            </div>
+          </section>
           <div id="comparison-content">
             <div class="card">
               <h3>Evolución de los resultados</h3>
@@ -513,12 +690,14 @@
       <div id="school-detail"></div>
     </dialog>
     <script src="engine.js?v=4"></script>
-    <script src="state.js?v=4"></script>
+    <script src="state.js?v=5"></script>
     <script src="data-loader.js?v=3"></script>
     <script src="ui.js?v=4"></script>
     <script src="subject-guide.js?v=4"></script>
     <script src="comparisons.js?v=4"></script>
     <script src="journey.js?v=4"></script>
-    <script src="app.js?v=4"></script>
+    <script src="chart-stats.js?v=5"></script>
+    <script src="chart-lab.js?v=5"></script>
+    <script src="app.js?v=5"></script>
   </body>
 </html>

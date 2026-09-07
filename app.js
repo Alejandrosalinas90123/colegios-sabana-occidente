@@ -182,6 +182,7 @@ function render() {
     result.error || `${fmt(result.rows.length, 0)} colegios disponibles con los filtros actuales.`
   );
   SchoolJourney.refresh();
+  ChartLab.render();
   DashboardUI.labelTables();
   save();
   DashboardUI.restoreFocus(focus);
@@ -610,6 +611,7 @@ async function start() {
     $('compare-metric').innerHTML = $('metric').innerHTML;
     bind();
     SchoolJourney.initialize(Boolean(location.hash && location.hash !== '#main'));
+    ChartLab.initialize();
     syncControls();
     $('app').hidden = false;
     $('share').disabled = false;

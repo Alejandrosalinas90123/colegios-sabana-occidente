@@ -15,6 +15,18 @@ Las preguntas de preferencias son orientativas, creadas para esta aplicación. L
 
 Las respuestas de importancia se traducen a pesos relativos 0, 10, 20, 30 y 40. El usuario puede modificarlos directamente entre 0 y 100. Se normalizan dividiendo cada peso por la suma; si todos son cero, la interfaz impide avanzar. Son prioridades del usuario, no coeficientes oficiales del ICFES.
 
+### Laboratorio de gráficas
+
+Se conserva la evolución anual original con selector de materias/indicador y se añade una gráfica **fija del promedio general por colegio y año**: la media simple de las cinco materias, después de combinar jornadas por evaluados. Cambiar pesos, materia o promedio histórico no redefine esa media anual. Los años ausentes permanecen vacíos y no se conectan años no consecutivos.
+
+El laboratorio añade segmentos entre dos años elegidos (inicio, final y cambio en puntos), dispersión de puntaje frente a evaluados en un año, y sensibilidad de posiciones al mezclar pesos iguales con los pesos del usuario. Esta última mantiene fijo el conjunto completo de colegios elegibles y aplica posiciones de competencia para empates. Las líneas unen cinco escenarios muestreados, sin interpolar posiciones; los círculos grandes y la tabla calculan el porcentaje exacto del control. Aplicar el escenario actualiza el ranking, pero conserva el promedio general anual.
+
+Todos los valores se ofrecen también en tablas. Los puntos permiten consultar un colegio/año con ratón o toque, y los selectores nativos ofrecen esa función por teclado. Se pueden resaltar colegios y cambiar años e indicadores. La configuración se conserva en los enlaces compartidos.
+
+Inspiración: [Python Graph Gallery](https://python-graph-gallery.com/), especialmente [líneas](https://python-graph-gallery.com/line-chart/), [dispersión](https://python-graph-gallery.com/scatter-plot/) y [segmentos con puntos](https://python-graph-gallery.com/lollipop-plot/). Implementación propia en SVG/JavaScript, sin ejecutar Python en el navegador ni importar datos de los ejemplos.
+
+La revisión de la base completa encontró 3.613 registros con algún puntaje cero y 28.731 registros con menos de 20 evaluados (registros fuente de jornadas, no necesariamente colegios/años ya combinados). Los ceros se conservan; no se convierten automáticamente en ausencias. El laboratorio calcula para la selección los registros con cero, los años ausentes, las cohortes anuales pequeñas y los colegios fuera de los filtros. No se muestran intervalos de confianza, significancia ni causalidad que los agregados no permitan sostener.
+
 ### Comparaciones descriptivas
 
 Además de trayectoria anual, materias y cohortes, se incluye un colegio de referencia seleccionable: diferencia media del indicador en años comunes, número de años por encima y empates. Cada año común pesa igual, independientemente del método de promedio histórico elegido para el ranking; así se evita comparar periodos distintos. Si no existen años comunes, no se calcula la diferencia. Se conservan valores exactos en tablas accesibles.
@@ -44,6 +56,7 @@ El escenario se expresa sobre 100 puntos. TOTAL suma los cinco puntajes sin peso
 - `data-loader.js`: descarga con límite de 30 segundos, descompresión y controles de versión/recuento.
 - `engine.js`: cálculos puros. `state.js`: validación y serialización de enlaces. `app.js`: coordinación y presentación.
 - `journey.js`: recorridos, selección visible, preguntas y navegación. `subject-guide.js`: resúmenes y fuentes oficiales. `comparisons.js`: comparaciones descriptivas puras.
+- `chart-stats.js`: datos puros para las gráficas, sensibilidad y revisión de cobertura. `chart-lab.js`: controles, dibujos SVG, tablas y consultas de valores.
 
 Los enlaces nuevos compactan selecciones grandes de municipios en intervalos de identificadores, manteniendo la versión fija de los datos. El decodificador sigue aceptando los enlaces anteriores. El recorrido, los departamentos habilitados y el colegio de referencia también se conservan al compartir.
 
