@@ -1,19 +1,372 @@
 <!doctype html>
-<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#123b35"><meta name="description" content="Compara resultados históricos Saber 11 de colegios: municipios de Colombia, materias, estudiantes y escenarios de pesos."><title>Atlas de colegios · Saber 11</title><link rel="stylesheet" href="styles.css?v=2"></head><body>
-<a class="skip" href="#main">Ir a los resultados</a>
-<header class="masthead"><div class="brand"><span class="mark" aria-hidden="true">a.</span><div><strong>Atlas de colegios</strong><span>RESULTADOS SABER 11 · 2021–2025</span></div></div><button id="share" class="light" disabled>Compartir selección ↗</button></header>
-<section class="intro"><div><span class="eyebrow">UNA DECISIÓN CON PERSPECTIVA</span><h1>Encuentra, compara.<br><em>Elige con más información.</em></h1><p>Explora cinco años de resultados. Decide qué materias pesan más y compara la trayectoria de tus colegios favoritos.</p></div><div class="coverage"><strong>1.116</strong><span>municipios disponibles</span><small>72.686 registros · fuente GIP</small></div></section>
-<div id="status" role="status" aria-live="polite">Cargando la base verificada…</div>
-<div id="app" class="layout" hidden><aside class="filters" aria-label="Filtros del tablero">
-<div class="filter-head"><h2>Tu búsqueda</h2><button id="reset" class="text-button">Restablecer</button></div>
-<details open class="filter-section"><summary>01 / Dónde buscar</summary><div class="presets"><button id="sabana">Sabana de Occidente</button><button id="national">Todo el país</button></div><label for="department">Departamento <small>para buscar municipios</small></label><select id="department"><option value="">Todos los departamentos</option></select><label for="place-search">Buscar municipio</label><input id="place-search" type="search" placeholder="Ej. Chía, Cali, Pasto…"><div class="between"><span id="place-count"></span><button id="clear-places" class="text-button">Quitar todos</button></div><button id="add-visible" class="small-button">Añadir municipios de esta búsqueda</button><div id="places" class="place-list" aria-label="Municipios disponibles"></div><small>Se pueden combinar municipios de varios departamentos. Cambiar el departamento solo filtra esta lista.</small></details>
-<details open class="filter-section"><summary>02 / Qué años comparar</summary><div id="years" class="years"></div><label class="check"><input id="complete" type="checkbox" checked> Exigir datos en todos los años elegidos</label></details>
-<details class="filter-section"><summary>03 / Afinar los resultados</summary><label for="nature">Sector</label><select id="nature"><option value="all">Oficiales y no oficiales</option><option>OFICIAL</option><option>NO OFICIAL</option></select><label for="session">Jornada</label><select id="session"><option value="diurnal">Diurnas</option><option value="all">Todas las jornadas</option><option>MAÑANA</option><option>TARDE</option><option>COMPLETA</option><option>ÚNICA</option><option>NOCTURNA</option><option>FIN DE SEMANA</option></select><label for="minimum">Mínimo de evaluados por año</label><input id="minimum" type="number" min="0" max="100000" value="0"><label for="aggregation">Promedio histórico</label><select id="aggregation"><option value="equal">Cada año pesa lo mismo</option><option value="students">Ponderar por evaluados</option></select></details>
-<details open class="filter-section"><summary>04 / Tus prioridades</summary><p class="hint">Mueve los controles. Los porcentajes se ajustan para sumar 100 %.</p><div id="weights"></div><div class="presets"><button data-preset="equal">Equilibrado</button><button data-preset="english">Más inglés</button><button data-preset="stem">Más ciencias</button></div><button id="reference" class="small-button">Guardar estos pesos como referencia</button><p id="reference-label" class="hint"></p><small>El cambio de posición compara tus pesos con la referencia, usando los mismos colegios y filtros.</small></details>
-</aside><main id="main" tabindex="-1">
-<div class="tabs" aria-label="Vistas del tablero"><button id="explore-tab" aria-pressed="true">Explorar colegios</button><button id="compare-tab" aria-pressed="false">Comparar seleccionados <span id="selection-count">0</span></button></div><div id="scope" class="scope"></div><div id="stats" class="stats"></div><div id="selection" class="selection"></div>
-<section id="explore-view"><div class="section-title"><div><span class="eyebrow">EL PANORAMA</span><h2>¿Cómo se comparan?</h2></div><label>Ver resultados por<select id="metric"><option value="score">Mis pesos · 0 a 100</option><option value="total">TOTAL · 0 a 500</option><option value="0">Lectura crítica</option><option value="1">Matemáticas</option><option value="2">Sociales y ciudadanas</option><option value="3">Ciencias naturales</option><option value="4">Inglés</option></select></label></div><div class="card"><p id="bar-description" class="hint"></p><div id="ranking-chart" class="ranking-chart"></div></div><div class="section-title"><div><span class="eyebrow">ENCUENTRA TUS OPCIONES</span><h2>Colegios para explorar</h2></div><button id="top-four">Comparar los primeros 4</button></div><label for="school-search" class="sr-only">Buscar colegio por nombre</label><input id="school-search" type="search" class="school-search" placeholder="Buscar colegio por nombre…"><p class="hint">La posición corresponde a tus pesos. Pulsa el nombre para ver la ficha o añade hasta 6 colegios a la comparación.</p><div class="table-wrap"><table><thead><tr><th>Posición</th><th>Colegio</th><th>Mis pesos /100</th><th id="metric-heading">TOTAL /500</th><th>Cambio de posición</th><th>Evaluados acumulados</th><th>Años</th><th>Comparar</th></tr></thead><tbody id="ranking"></tbody></table></div><div class="pagination"><button id="prev">← Anterior</button><span id="page"></span><button id="next">Siguiente →</button></div></section>
-<section id="compare-view" hidden><div class="section-title"><div><span class="eyebrow">TUS FINALISTAS</span><h2>Una comparación con contexto</h2></div><label>Ver resultados por<select id="compare-metric"></select></label></div><p id="compare-empty" class="empty" hidden>Añade colegios desde «Explorar colegios» para comparar su evolución, materias y número de evaluados.</p><div id="comparison-content"><div class="card"><h3>Evolución de los resultados</h3><p class="hint">Cada punto es un año con datos. Pasa el cursor o enfoca un punto para consultar el valor. Los años faltantes no se rellenan.</p><div id="legend" class="legend"></div><div id="trend"></div></div><div class="card"><h3>Materias, lado a lado</h3><p class="hint">Promedios históricos, escala de 0 a 100. La intensidad del color representa el puntaje.</p><div id="subjects" class="table-wrap"></div></div><div class="card"><h3>¿Cuántos estudiantes presentaron el examen?</h3><p class="hint">Evaluados por colegio y año. Menos de 20 se señala como cohorte pequeña, sin penalizar el puntaje.</p><div id="cohorts"></div></div></div></section>
-<details class="card data-detail"><summary>Consultar y descargar los datos de esta búsqueda</summary><p class="hint">Registros originales incluidos por municipio, año, sector y jornada, antes de excluir colegios por cobertura o mínimo de evaluados. Incluyen TOTAL, calculado como suma de las cinco materias.</p><button id="download">Descargar CSV para Excel</button><p id="raw-count"></p><div id="raw-table" class="table-wrap"></div><button id="raw-more">Mostrar 100 registros más</button></details>
-<details class="card methodology"><summary>Cómo leer los resultados y qué se verificó</summary><p>Fuente: <a href="https://www.gip.com.co/gipdata/icfes" target="_blank" rel="noopener">GIP · Resultados ICFES</a>, años 2021 a 2025. Se conserva la base de <strong>72.686 registros</strong> de «versión verificada 2.xlsx». Se verificaron los valores, las columnas, la ubicación y el número de filas al preparar esta página. <a href="verification.json" target="_blank">Ver control de integridad</a>.</p><p>Una institución se identifica por su nombre exacto, municipio y departamento en la fuente. La base no ofrece un código institucional utilizable: nombres diferentes no se fusionan automáticamente. Un cambio de nombre puede producir una historia incompleta.</p><p>Al combinar jornadas de un colegio en un año se pondera cada materia por sus evaluados. El promedio histórico da el mismo peso a cada año disponible, salvo que elijas ponderar por evaluados. Los años faltantes nunca se estiman. Los evaluados acumulados suman cohortes y no representan personas únicas ni la matrícula total.</p><p><strong>Mis pesos</strong> es el promedio de las cinco materias con tus porcentajes, de 0 a 100. <strong>TOTAL</strong> es su suma sin pesos, de 0 a 500: no es el puntaje global oficial del ICFES. La posición usa «Mis pesos» y los empates comparten posición. El cambio de posición usa el escenario de referencia dentro de la misma búsqueda.</p><p>Una cohorte pequeña es una señal para interpretar los promedios con cuidado; no recibe una penalización. Los resultados académicos son una parte de la elección del colegio y no describen por sí solos su bienestar, convivencia o proyecto educativo.</p><p>Los 1.116 municipios y 33 territorios corresponden a las denominaciones presentes en esta base; no se agregaron municipios o registros ausentes.</p></details><footer>Atlas de colegios · Datos históricos, decisiones informadas.<br>Sabana de Occidente y municipios de Colombia.</footer></main></div>
-<dialog id="school-dialog"><form method="dialog"><button class="close" aria-label="Cerrar ficha">Cerrar ×</button></form><div id="school-detail"></div></dialog><script src="engine.js?v=2"></script><script src="state.js?v=2"></script><script src="app.js?v=2"></script></body></html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#123b35" />
+    <meta
+      name="description"
+      content="Compara resultados históricos Saber 11 de colegios: municipios de Colombia, materias, estudiantes y escenarios de pesos."
+    />
+    <title>Atlas de colegios · Saber 11</title>
+    <link rel="stylesheet" href="styles.css?v=3" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Ir a los resultados</a>
+    <header class="masthead">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">a.</span>
+        <div>
+          <strong>Atlas de colegios</strong>
+          <span>RESULTADOS SABER 11 · 2021–2025</span>
+        </div>
+      </div>
+      <button id="share" class="secondary-inverse" disabled>Compartir selección ↗</button>
+    </header>
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <h1 id="page-title">Compara colegios con perspectiva</h1>
+        <p>
+          Resultados Saber 11 · 2021–2025 · 1.116 municipios. Elige territorios, ajusta tus
+          prioridades y compara hasta seis colegios.
+        </p>
+      </div>
+    </section>
+    <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
+    <section id="loading" class="loading-panel" aria-labelledby="loading-title" aria-busy="true">
+      <span class="spinner" aria-hidden="true"> </span>
+      <h2 id="loading-title">Cargando la base verificada</h2>
+      <p>Preparando 72.686 registros. Esto puede tardar unos segundos.</p>
+    </section>
+    <div id="load-error" class="load-error" hidden>
+      <p id="load-error-message" role="alert"></p>
+      <button id="retry" class="primary">Reintentar carga</button>
+    </div>
+    <div id="app" class="layout" hidden>
+      <aside class="filters" aria-label="Filtros del tablero">
+        <div class="filter-head">
+          <h2>Tu búsqueda</h2>
+          <button id="reset" class="text-button">Restablecer</button>
+        </div>
+        <details open class="filter-section">
+          <summary>01 / Dónde buscar</summary>
+          <div class="presets">
+            <button id="sabana">Sabana de Occidente</button>
+            <button id="national">Todo el país</button>
+          </div>
+          <label for="department">Departamento <small>para buscar municipios</small> </label>
+          <select id="department">
+            <option value="">Todos los departamentos</option>
+          </select>
+          <label for="place-search">Buscar municipio</label>
+          <input id="place-search" type="search" placeholder="Ej. Chía, Cali, Pasto…" />
+          <div class="between">
+            <span id="place-count"> </span>
+            <button id="clear-places" class="text-button">Quitar todos</button>
+          </div>
+          <button id="add-visible" class="small-button">Añadir municipios de esta búsqueda</button>
+          <div
+            id="places"
+            class="place-list"
+            role="group"
+            aria-label="Municipios disponibles"
+            aria-describedby="places-error"
+          ></div>
+          <p id="places-error" class="field-error" role="status" hidden></p>
+          <small
+            >Se pueden combinar municipios de varios departamentos. Cambiar el departamento solo
+            filtra esta lista.</small
+          >
+        </details>
+        <details open class="filter-section">
+          <summary>02 / Qué años comparar</summary>
+          <div
+            id="years"
+            class="years"
+            role="group"
+            aria-label="Años que se incluyen en la comparación"
+            aria-describedby="years-error"
+          ></div>
+          <p id="years-error" class="field-error" role="status" hidden></p>
+          <label class="check">
+            <input id="complete" type="checkbox" checked /> Exigir datos en todos los años
+            elegidos</label
+          >
+        </details>
+        <details class="filter-section">
+          <summary>03 / Afinar los resultados</summary>
+          <label for="nature">Sector</label>
+          <select id="nature">
+            <option value="all">Oficiales y no oficiales</option>
+            <option>OFICIAL</option>
+            <option>NO OFICIAL</option>
+          </select>
+          <label for="session">Jornada</label>
+          <select id="session">
+            <option value="diurnal">Diurnas</option>
+            <option value="all">Todas las jornadas</option>
+            <option>MAÑANA</option>
+            <option>TARDE</option>
+            <option>COMPLETA</option>
+            <option>ÚNICA</option>
+            <option>NOCTURNA</option>
+            <option>FIN DE SEMANA</option>
+          </select>
+          <label for="minimum">Mínimo de evaluados por año</label>
+          <input
+            id="minimum"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            max="100000"
+            step="1"
+            value="0"
+            aria-describedby="minimum-hint minimum-error"
+          />
+          <p id="minimum-hint" class="hint">Usa 0 para incluir cualquier tamaño de cohorte.</p>
+          <p id="minimum-error" class="field-error" role="status" hidden></p>
+          <label for="aggregation">Promedio histórico</label>
+          <select id="aggregation">
+            <option value="equal">Cada año pesa lo mismo</option>
+            <option value="students">Ponderar por evaluados</option>
+          </select>
+        </details>
+        <details open class="filter-section">
+          <summary>04 / Tus prioridades</summary>
+          <p class="hint">Mueve los controles. Los porcentajes se ajustan para sumar 100 %.</p>
+          <div
+            id="weights"
+            role="group"
+            aria-label="Pesos de las cinco materias"
+            aria-describedby="weights-error"
+          ></div>
+          <p id="weights-error" class="field-error" role="status" hidden></p>
+          <div class="presets">
+            <button data-preset="equal">Equilibrado</button>
+            <button data-preset="english">Más inglés</button>
+            <button data-preset="stem">Más ciencias</button>
+          </div>
+          <button id="reference" class="small-button">Guardar estos pesos como referencia</button>
+          <p id="reference-label" class="hint"></p>
+          <small
+            >El cambio de posición compara tus pesos con la referencia, usando los mismos colegios y
+            filtros.</small
+          >
+        </details>
+      </aside>
+      <main id="main" tabindex="-1">
+        <div class="tabs" role="tablist" aria-label="Vistas del tablero">
+          <button
+            id="explore-tab"
+            role="tab"
+            aria-selected="true"
+            aria-controls="explore-view"
+            tabindex="0"
+          >
+            Explorar colegios
+          </button>
+          <button
+            id="compare-tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="compare-view"
+            tabindex="-1"
+          >
+            Comparar seleccionados <span id="selection-count">0</span>
+          </button>
+        </div>
+        <div id="scope" class="scope"></div>
+        <div id="stats" class="stats"></div>
+        <div id="selection" class="selection"></div>
+        <section id="explore-view" role="tabpanel" aria-labelledby="explore-tab" tabindex="0">
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">EL PANORAMA</span>
+              <h2>¿Cómo se comparan?</h2>
+            </div>
+            <label
+              >Ver resultados por<select id="metric">
+                <option value="score">Mis pesos · 0 a 100</option>
+                <option value="total">TOTAL · 0 a 500</option>
+                <option value="0">Lectura crítica</option>
+                <option value="1">Matemáticas</option>
+                <option value="2">Sociales y ciudadanas</option>
+                <option value="3">Ciencias naturales</option>
+                <option value="4">Inglés</option>
+              </select>
+            </label>
+          </div>
+          <div class="card">
+            <p id="bar-description" class="hint"></p>
+            <div id="ranking-chart" class="ranking-chart"></div>
+          </div>
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">ENCUENTRA TUS OPCIONES</span>
+              <h2>Colegios para explorar</h2>
+            </div>
+            <button id="top-four" class="primary">Comparar los primeros 4</button>
+          </div>
+          <label for="school-search" class="field-label">Buscar colegio por nombre</label>
+          <input
+            id="school-search"
+            maxlength="200"
+            type="search"
+            class="school-search"
+            placeholder="Buscar colegio por nombre…"
+          />
+          <p class="hint">
+            La posición corresponde a tus pesos. Pulsa el nombre para ver la ficha o añade hasta 6
+            colegios a la comparación.
+          </p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Posición</th>
+                  <th>Colegio</th>
+                  <th>Mis pesos /100</th>
+                  <th id="metric-heading">TOTAL /500</th>
+                  <th>Cambio de posición</th>
+                  <th>Evaluados acumulados</th>
+                  <th>Años</th>
+                  <th>Comparar</th>
+                </tr>
+              </thead>
+              <tbody id="ranking"></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button id="prev">← Anterior</button>
+            <span id="page"> </span>
+            <button id="next">Siguiente →</button>
+          </div>
+        </section>
+        <section
+          id="compare-view"
+          role="tabpanel"
+          aria-labelledby="compare-tab"
+          tabindex="0"
+          hidden
+        >
+          <div class="section-title">
+            <div>
+              <span class="eyebrow">TUS FINALISTAS</span>
+              <h2>Una comparación con contexto</h2>
+            </div>
+            <label>Ver resultados por<select id="compare-metric"></select> </label>
+          </div>
+          <p id="compare-empty" class="empty" hidden>
+            Añade colegios desde «Explorar colegios» para comparar su evolución, materias y número
+            de evaluados.
+          </p>
+          <div id="comparison-content">
+            <div class="card">
+              <h3>Evolución de los resultados</h3>
+              <p class="hint">
+                Cada punto es un año con datos. Consulta los valores exactos en la tabla debajo de
+                la gráfica; los años faltantes no se rellenan.
+              </p>
+              <div id="legend" class="legend"></div>
+              <div
+                id="trend"
+                tabindex="0"
+                role="region"
+                aria-label="Gráfica de evolución; valores exactos en la tabla siguiente"
+              ></div>
+              <details class="annual-values">
+                <summary>Ver valores anuales de la gráfica</summary>
+                <div
+                  id="trend-table"
+                  class="table-wrap"
+                  data-label="Valores exactos de la evolución anual"
+                ></div>
+              </details>
+            </div>
+            <div class="card">
+              <h3>Materias, lado a lado</h3>
+              <p class="hint">
+                Promedios históricos, escala de 0 a 100. La intensidad del color representa el
+                puntaje.
+              </p>
+              <div id="subjects" class="table-wrap"></div>
+            </div>
+            <div class="card">
+              <h3>¿Cuántos estudiantes presentaron el examen?</h3>
+              <p class="hint">
+                Evaluados por colegio y año. Menos de 20 se señala como cohorte pequeña, sin
+                penalizar el puntaje.
+              </p>
+              <div id="cohorts"></div>
+            </div>
+          </div>
+        </section>
+        <details class="card data-detail">
+          <summary>Consultar y descargar los datos de esta búsqueda</summary>
+          <p class="hint">
+            Registros originales incluidos por municipio, año, sector y jornada, antes de excluir
+            colegios por cobertura o mínimo de evaluados. Incluyen TOTAL, calculado como suma de las
+            cinco materias.
+          </p>
+          <button id="download">Descargar CSV para Excel</button>
+          <p id="raw-count"></p>
+          <div id="raw-table" class="table-wrap"></div>
+          <button id="raw-more">Mostrar 100 registros más</button>
+        </details>
+        <details class="card methodology">
+          <summary>Cómo leer los resultados y qué se verificó</summary>
+          <p>
+            Fuente:
+            <a href="https://www.gip.com.co/gipdata/icfes" target="_blank" rel="noopener"
+              >GIP · Resultados ICFES</a
+            >, años 2021 a 2025. Se conserva la base de <strong>72.686 registros</strong> de
+            «versión verificada 2.xlsx». Se verificaron los valores, las columnas, la ubicación y el
+            número de filas al preparar esta página.
+            <a href="verification.json" target="_blank">Ver control de integridad</a>.
+          </p>
+          <p>
+            Una institución se identifica por su nombre exacto, municipio y departamento en la
+            fuente. La base no ofrece un código institucional utilizable: nombres diferentes no se
+            fusionan automáticamente. Un cambio de nombre puede producir una historia incompleta.
+          </p>
+          <p>
+            Al combinar jornadas de un colegio en un año se pondera cada materia por sus evaluados.
+            El promedio histórico da el mismo peso a cada año disponible, salvo que elijas ponderar
+            por evaluados. Los años faltantes nunca se estiman. Los evaluados acumulados suman
+            cohortes y no representan personas únicas ni la matrícula total.
+          </p>
+          <p>
+            <strong>Mis pesos</strong> es el promedio de las cinco materias con tus porcentajes, de
+            0 a 100. <strong>TOTAL</strong> es su suma sin pesos, de 0 a 500: no es el puntaje
+            global oficial del ICFES. La posición usa «Mis pesos» y los empates comparten posición.
+            El cambio de posición usa el escenario de referencia dentro de la misma búsqueda.
+          </p>
+          <p>
+            Una cohorte pequeña es una señal para interpretar los promedios con cuidado; no recibe
+            una penalización. Los resultados académicos son una parte de la elección del colegio y
+            no describen por sí solos su bienestar, convivencia o proyecto educativo.
+          </p>
+          <p>
+            Los 1.116 municipios y 33 territorios corresponden a las denominaciones presentes en
+            esta base; no se agregaron municipios o registros ausentes.
+          </p>
+        </details>
+        <footer>
+          Atlas de colegios · Datos históricos, decisiones informadas.<br />Sabana de Occidente y
+          municipios de Colombia.
+        </footer>
+      </main>
+    </div>
+    <dialog id="school-dialog" aria-labelledby="dialog-title">
+      <form method="dialog">
+        <button class="close" aria-label="Cerrar ficha">Cerrar ×</button>
+      </form>
+      <div id="school-detail"></div>
+    </dialog>
+    <script src="engine.js?v=2"></script>
+    <script src="state.js?v=2"></script>
+    <script src="data-loader.js?v=3"></script>
+    <script src="ui.js?v=3"></script>
+    <script src="app.js?v=3"></script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "atlas-colegios",
+  "private": true,
+  "version": "3.0.0",
+  "description": "Static accessible Saber 11 school comparison dashboard",
+  "scripts": {
+    "test": "node test.cjs && node tests/ui.cjs",
+    "format": "prettier --write *.html *.css *.js tests/*.cjs test.cjs",
+    "format:check": "prettier --check *.html *.css *.js tests/*.cjs test.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0",
+    "prettier": "3.6.2"
+  }
+}
