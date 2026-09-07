@@ -93,6 +93,34 @@ function contrast(a, b) {
   const { dom, w, $, errors } = await mount();
   assert.equal($('load-error').hidden, true, $('load-error-message').textContent);
   assert.equal($('step-departments').hidden, false);
+  // Add municipalities one at a time without losing earlier choices.
+  $('clear-places').click();
+  for (const town of ['FUNZA', 'MADRID', 'MOSQUERA', 'BOJACA', 'CHIA', 'COTA']) {
+    $('place-search').value = town;
+    $('place-search').dispatchEvent(new w.Event('input'));
+    const box = $('places').querySelector('input');
+    assert.ok(box, town);
+    box.checked = true;
+    box.dispatchEvent(new w.Event('change', { bubbles: true }));
+    $('next-place-search').click();
+    assert.equal($('place-search').value, '');
+    assert.equal(w.document.activeElement, $('place-search'));
+  }
+  assert.equal($('place-selection-inline').querySelectorAll('.chip').length, 6);
+  $('journey-reset').click();
+  w.document.querySelector('[data-open-picker]').click();
+  assert.equal($('step-schools').hidden, false);
+  const option = $('school-picker').querySelectorAll('.school-option')[10];
+  const manual = { id: option.querySelector('button').dataset.pick, name: option.querySelector('strong').textContent };
+  $('pick-school-search').value = manual.name;
+  $('pick-school-search').dispatchEvent(new w.Event('input'));
+  $('school-picker').querySelector(`[data-pick="${manual.id}"]`).click();
+  $('next-school-search').click();
+  assert.equal($('pick-school-search').value, '');
+  assert.ok($('picker-selected').textContent.includes(manual.name));
+  assert.ok($('picker-selected').querySelector(`[data-pick="${manual.id}"]`));
+  $('journey-reset').click();
+
   assert.equal($('main').hidden, true);
   assert.match($('journey-summary').textContent, /4 municipios incluidos/);
   assert.equal($('chosen-places').querySelectorAll('[data-remove-place]').length, 4);

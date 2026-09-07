@@ -126,6 +126,13 @@ const SchoolJourney = (() => {
       `${state.journey.departments.length} departamentos habilitados · ${ps.length} municipios incluidos en ${deps.length} departamentos · ${state.years.length} años · ${state.selected.length} colegios elegidos para comparar.${ps.length && ps.length <= 6 ? ' Municipios incluidos: ' + ps.map((p) => p.town + ' (' + p.department + ')').join(', ') + '.' : ''}`;
     $('chosen-places-title').textContent = `Ver y quitar municipios seleccionados (${ps.length})`;
     chosenPlaces();
+    $('place-selection-inline').innerHTML =
+      ps
+        .map(
+          (p) =>
+            `<span class="chip"><span>✓ ${esc(p.town)} · ${esc(p.department)}</span><button data-remove-place="${p.id}" aria-label="Quitar ${esc(p.town)} de ${esc(p.department)}">×</button></span>`
+        )
+        .join('') || '<p>Aún no has añadido municipios.</p>';
     $('chosen-schools').innerHTML = state.selected.length
       ? `<p><strong>Colegios elegidos</strong> · ${included().length} cumplen los filtros actuales.</p><div class="selection">${state.selected
           .map((id) => {
@@ -147,6 +154,13 @@ const SchoolJourney = (() => {
           Number(eligible.has(b.id)) - Number(eligible.has(a.id)) ||
           a.name.localeCompare(b.name, 'es')
       );
+    $('picker-selected').innerHTML =
+      state.selected
+        .map((id) => {
+          const s = schoolMap.get(id);
+          return `<span class="chip"><span>✓ ${esc(s.name)} · ${esc(s.town)}${eligible.has(id) ? '' : ' · fuera de filtros'}</span><button data-pick="${id}" aria-label="Quitar ${esc(s.name)}">×</button></span>`;
+        })
+        .join('') || '<p>Aún no has añadido colegios. Búscalos por nombre y pulsa Añadir.</p>';
     pickerPage = Math.max(0, Math.min(pickerPage, Math.ceil(schools.length / 20) - 1));
     $('picker-count').textContent =
       `${schools.length} colegios encontrados · ${included().length} seleccionados con datos suficientes`;
@@ -272,6 +286,12 @@ const SchoolJourney = (() => {
     };
     $('department-search').oninput = renderDepartments;
     $('chosen-place-search').oninput = chosenPlaces;
+    $('next-school-search').onclick = () => {
+      $('pick-school-search').value = '';
+      pickerPage = 0;
+      picker();
+      $('pick-school-search').focus();
+    };
     $('pick-school-search').oninput = () => {
       pickerPage = 0;
       picker();
@@ -339,11 +359,16 @@ const SchoolJourney = (() => {
     document.addEventListener('click', (e) => {
       const button = e.target.closest('button');
       if (!button) return;
+      if (button.dataset.openPicker !== undefined) {
+        state.journey.mode = 'compare';
+        go('schools');
+      }
       if (button.dataset.goto) go(button.dataset.goto);
       if (button.dataset.route) {
         const next = { ...state.journey, mode: button.dataset.route };
         if (!paths[next.mode].includes(next.step)) next.step = 'priorities';
         change({ journey: next });
+        if (next.mode === 'compare') go('schools');
       }
       if (button.dataset.removePlace !== undefined) {
         const id = Number(button.dataset.removePlace);

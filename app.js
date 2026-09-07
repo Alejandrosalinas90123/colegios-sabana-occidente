@@ -382,6 +382,11 @@ function download() {
 function bind() {
   $('department').onchange = renderPlaces;
   $('place-search').oninput = renderPlaces;
+  $('next-place-search').onclick = () => {
+    $('place-search').value = '';
+    renderPlaces();
+    $('place-search').focus();
+  };
   $('places').onchange = (e) => {
     const id = Number(e.target.dataset.place);
     if (!Number.isInteger(id)) return;

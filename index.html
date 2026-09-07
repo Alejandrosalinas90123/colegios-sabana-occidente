@@ -64,7 +64,7 @@
             <button data-goto="places">Editar municipios</button>
           </div>
           <p id="journey-summary"></p>
-          <details id="chosen-places-details">
+          <details id="chosen-places-details" open>
             <summary id="chosen-places-title">Ver municipios seleccionados</summary>
             <label for="chosen-place-search">Buscar entre los seleccionados</label
             ><input id="chosen-place-search" type="search" placeholder="Municipio o departamento" />
@@ -114,12 +114,30 @@
             <option value="">Todos los departamentos</option>
           </select>
           <label for="place-search">Buscar municipio</label>
-          <input id="place-search" type="search" placeholder="Ej. Chía, Cali, Pasto…" />
+          <input
+            id="place-search"
+            type="search"
+            placeholder="Escribe un municipio, por ejemplo: Chía"
+            aria-describedby="place-search-help"
+          />
+          <p id="place-search-help" class="hint">
+            Busca un municipio, marca su casilla y pulsa «Buscar otro municipio». Repite para añadir
+            todos los que quieras: los anteriores se conservan. No necesitas escribir nombres
+            separados por comas.
+          </p>
+          <button id="next-place-search">Buscar otro municipio</button>
           <div class="between">
             <span id="place-count"> </span>
             <button id="clear-places" class="text-button">Quitar todos</button>
           </div>
-          <button id="add-visible" class="small-button">Añadir municipios de esta búsqueda</button>
+          <details>
+            <summary>Selección en bloque (opcional)</summary>
+            <button id="add-visible" class="small-button">
+              Marcar todos los municipios visibles
+            </button>
+          </details>
+          <p><strong>Municipios que ya añadiste</strong></p>
+          <div id="place-selection-inline" class="selection"></div>
           <div
             id="places"
             class="place-list"
@@ -239,12 +257,15 @@
       <section id="step-schools" class="journey-panel" aria-labelledby="heading-schools" hidden="">
         <h2 id="heading-schools" tabindex="-1">Escoge los colegios que quieres comparar</h2>
         <p>
-          Selecciona entre 2 y 6 colegios. Puedes combinar municipios. Los colegios sin resultados
-          suficientes aparecen señalados; revisa años y filtros para incluirlos.
+          Busca y añade entre 2 y 6 colegios, uno por uno. No tienen que estar entre los primeros
+          del ranking. Puedes combinar municipios. Los colegios sin resultados suficientes aparecen
+          señalados; revisa años y filtros para incluirlos.
         </p>
         <button data-goto="places">Cambiar municipios, años o filtros</button
         ><label for="pick-school-search">Buscar colegio por nombre o municipio</label
         ><input id="pick-school-search" type="search" placeholder="Ej. nombre del colegio" />
+        <button id="next-school-search">Buscar otro colegio</button>
+        <div id="picker-selected" class="selection"></div>
         <p id="picker-count" role="status"></p>
         <div id="school-picker" class="school-picker"></div>
         <div class="pagination">
@@ -259,7 +280,7 @@
           <div class="presets">
             <button data-goto="priorities">Cambiar mis prioridades</button
             ><button data-goto="places">Cambiar territorios y años</button
-            ><button id="choose-more-schools">Elegir colegios para comparar</button>
+            ><button id="choose-more-schools" class="primary">Elegir colegios para comparar</button>
           </div>
           <div id="results-indicator" class="card"></div>
         </div>
@@ -313,7 +334,10 @@
               <span class="eyebrow">ENCUENTRA TUS OPCIONES</span>
               <h2>Colegios para explorar</h2>
             </div>
-            <button id="top-four" class="primary">Comparar los primeros 4</button>
+            <div class="actions">
+              <button data-open-picker="" class="primary">Elegir mis colegios por nombre</button
+              ><button id="top-four">Atajo: comparar los primeros 4</button>
+            </div>
           </div>
           <label for="school-search" class="field-label">Buscar colegio por nombre</label>
           <input
@@ -695,9 +719,9 @@
     <script src="ui.js?v=4"></script>
     <script src="subject-guide.js?v=4"></script>
     <script src="comparisons.js?v=4"></script>
-    <script src="journey.js?v=4"></script>
+    <script src="journey.js?v=6"></script>
     <script src="chart-stats.js?v=5"></script>
     <script src="chart-lab.js?v=5"></script>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>
