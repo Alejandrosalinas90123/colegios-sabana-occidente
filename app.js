@@ -142,7 +142,6 @@ function change(patch, { controls = false } = {}) {
 function render() {
   const focus = DashboardUI.captureFocus();
   result = SchoolEngine.calculate(data, state, state.weights, state.reference);
-  FamilyGuide.alignReference();
   filtered = result.rows.filter((r) => norm(r.name).includes(norm(state.search)));
   const ps = new Set(state.places),
     ys = new Set(state.years),

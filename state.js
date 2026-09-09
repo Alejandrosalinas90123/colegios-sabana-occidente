@@ -118,6 +118,7 @@ const DashboardState = (() => {
       out.chartOptions = {
         panel: [
           'annual',
+          'year',
           'change',
           'scatter',
           'sensitivity',
@@ -142,7 +143,7 @@ const DashboardState = (() => {
       };
     }
     if ('family' in o)
-      out.family = ['town', 'school', 'compare'].includes(o.family) ? o.family : null;
+      out.family = ['town', 'school', 'weights', 'compare'].includes(o.family) ? o.family : null;
     return out;
   }
   return { defaults, encode, decode };

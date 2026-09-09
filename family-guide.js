@@ -21,24 +21,33 @@ const FamilyGuide = (() => {
             ? 'Elige el municipio y revisa su departamento.'
             : 'No encontramos ese nombre. Prueba sin abreviaturas.';
   }
+  let schoolPage = 0;
   function schools() {
     const q = norm($('family-school-search').value.trim());
-    const matches = q.length >= 2 ? result.rows.filter((r) => norm(r.name).includes(q)) : [];
+    const matches = result.rows.filter((r) => norm(r.name + ' ' + r.town).includes(q));
+    schoolPage = Math.max(0, Math.min(schoolPage, Math.ceil(matches.length / 8) - 1));
     $('family-school-options').innerHTML = matches
-      .slice(0, 8)
+      .slice(schoolPage * 8, schoolPage * 8 + 8)
       .map(
         (r) =>
-          `<button data-family-school="${r.id}"><strong>${esc(r.name)}</strong><span>${esc(r.town)} · ${esc(r.department)}</span><span>Comparar con el mayor promedio de los municipios elegidos →</span></button>`
+          `<button data-family-school="${r.id}" aria-pressed="${state.selected.includes(r.id)}" ${state.selected.length >= 6 && !state.selected.includes(r.id) ? 'disabled' : ''}><strong>${esc(r.name)}</strong><span>${esc(r.town)} · ${fmt(r.score)}/100 · ${r.coverage}/${state.years.length} años</span><span>${state.selected.includes(r.id) ? '✓ Elegido · quitar' : 'Añadir a mi comparación'}</span></button>`
       )
       .join('');
-    $('family-school-help').textContent =
-      q.length < 2
-        ? 'Escribe parte del nombre y pulsa el colegio.'
-        : matches.length > 8
-          ? 'Hay más coincidencias. Completa un poco el nombre.'
-          : matches.length
-            ? 'Elige el nombre que corresponda a tu colegio.'
-            : 'No aparece con estos criterios. Revisa el nombre o permite años incompletos abajo.';
+    $('family-school-help').textContent = matches.length
+      ? `${matches.length} colegios · ordenados por tu indicador. Mostrando ${schoolPage * 8 + 1}–${Math.min(matches.length, schoolPage * 8 + 8)}.`
+      : 'No hay coincidencias. Cambia la búsqueda o permite años incompletos.';
+    $('family-school-prev').disabled = schoolPage === 0;
+    $('family-school-next').disabled = (schoolPage + 1) * 8 >= matches.length;
+    $('family-selected').innerHTML = state.selected
+      .map(
+        (id) =>
+          `<span class="chip"><span>${esc(schoolMap.get(id).name)}${result.rows.some((r) => r.id === id) ? '' : ' · fuera de filtros'}</span><button data-family-school="${id}" aria-label="Quitar ${esc(schoolMap.get(id).name)}">×</button></span>`
+      )
+      .join('');
+    const n = state.selected.filter((id) => result.rows.some((r) => r.id === id)).length;
+    $('family-compare-next').disabled = n < 2;
+    $('family-compare-next').textContent =
+      n < 2 ? 'Elige al menos 2 colegios' : `Comparar mis ${n} colegios →`;
   }
   let pendingPlaces = [];
   function chosenTowns() {
@@ -70,7 +79,9 @@ const FamilyGuide = (() => {
         places: [...pendingPlaces],
         years: [...data.years],
         family: 'school',
-        selected: [],
+        selected: state.selected.filter((id) => pendingPlaces.includes(schoolMap.get(id).place)),
+        weights: [...state.weights],
+        reference: [...state.reference],
         complete: true,
         journey: {
           mode: 'compare',
@@ -84,20 +95,21 @@ const FamilyGuide = (() => {
     $('family-title').focus();
   }
   function chooseSchool(id) {
-    const leader = result.rows[0];
-    if (!leader || !result.rows.some((r) => r.id === id)) return;
+    toggleSchool(id);
+  }
+  function compareSelected() {
+    if (state.selected.filter((id) => result.rows.some((r) => r.id === id)).length < 2) return;
     change({
       family: 'compare',
-      selected: [...new Set([id, leader.id])],
       view: 'compare',
-      journey: { ...state.journey, mode: 'compare', step: 'results', baseline: leader.id },
+      journey: { ...state.journey, mode: 'compare', step: 'results' },
       chartOptions: { ...state.chartOptions, panel: 'annual', scale: 'focused', highlight: null },
     });
     $('family-title').focus();
   }
   function refresh() {
     if (!ready) return;
-    const active = ['town', 'school', 'compare'].includes(state.family);
+    const active = ['town', 'school', 'weights', 'compare'].includes(state.family);
     $('family-guide').hidden = !active;
     if (active && state.family === 'town') $('share').disabled = true;
     $('family-start').hidden = active;
@@ -109,6 +121,8 @@ const FamilyGuide = (() => {
     if (state.family === 'town') announce('Añade los municipios donde quieres buscar.');
     for (const id of ['departments', 'places', 'schools', 'priorities'])
       $('step-' + id).hidden = true;
+    $('step-priorities').hidden = state.family !== 'weights';
+    $('family-weights').hidden = state.family !== 'weights';
     $('main').hidden = state.family !== 'compare';
     for (const step of ['town', 'school', 'compare'])
       $('family-' + step).hidden = state.family !== step;
@@ -116,10 +130,14 @@ const FamilyGuide = (() => {
       state.family === 'town'
         ? '¿En qué municipios buscas colegio?'
         : state.family === 'school'
-          ? '¿Qué colegio estás considerando?'
-          : 'Tu colegio frente al mayor promedio';
+          ? 'Descubre y elige tus colegios'
+          : state.family === 'weights'
+            ? '¿Qué materias te importan más?'
+            : 'Compara los colegios que elegiste';
     $('family-position').textContent =
-      `Paso ${['town', 'school', 'compare'].indexOf(state.family) + 1} de 3`;
+      state.family === 'weights'
+        ? 'Personaliza tu indicador'
+        : `Paso ${['town', 'school', 'compare'].indexOf(state.family) + 1} de 3`;
     $('family-location').textContent =
       state.family === 'town'
         ? ''
@@ -132,19 +150,12 @@ const FamilyGuide = (() => {
     $('family-incomplete').checked = !state.complete;
     $('family-criteria').textContent =
       `${state.years.join('–').replace(/–.*–/, '–')} · ${state.weights.every((w) => Math.abs(w - state.weights[0]) < 1e-9) ? 'cinco materias con igual peso' : 'con tus pesos personalizados'} · jornadas diurnas · ${state.complete ? 'colegios con datos en todos los años' : 'incluye colegios con años incompletos'}.`;
-    const leader = result.rows[0];
-    $('family-leader').innerHTML = leader
-      ? `<p>Mayor promedio entre ${result.rows.length} colegios que cumplen estos criterios:</p><strong>${esc(leader.name)}</strong><p>${esc(leader.town)} · ${esc(leader.department)}</p><p><strong>${fmt(leader.score)} /100</strong> · ${leader.coverage} años con datos${result.rows.filter((r) => Math.abs(r.score - leader.score) < 1e-9).length > 1 ? ' · primer puesto compartido' : ''}</p>`
-      : '<p>No hay colegios con estos criterios. Puedes permitir años incompletos o cambiar de municipio.</p>';
     if (state.family === 'school') schools();
-    if (state.family === 'compare') {
-      const candidate = result.rows.find((r) => r.id === state.selected[0]);
+    if (state.family === 'compare')
       $('family-result').innerHTML =
-        candidate && leader
-          ? `<p><strong>${esc(candidate.name)}</strong></p><p>${candidate.id === leader.id ? 'El colegio que elegiste tiene el mayor promedio con estos criterios.' : `Su promedio es <strong>${fmt(candidate.score)}/100</strong>. ${Math.abs(leader.score - candidate.score) < 1e-9 ? 'Empata con' : `Está ${fmt(leader.score - candidate.score)} puntos por debajo de`} <strong>${esc(leader.name)}</strong> (${fmt(leader.score)}/100).`}</p><p class="hint">${state.complete ? 'La comparación usa los mismos años seleccionados.' : 'Los años disponibles pueden ser distintos: revisa la gráfica antes de concluir.'} Abajo puedes revisar su trayectoria o elegir otra comparación.</p>`
-          : '<p>Revisa los colegios seleccionados y los filtros.</p>';
-    }
+        `<p>${state.selected.length} colegios elegidos por ti. Selecciona abajo qué quieres comparar.</p>`;
   }
+
   function initialize() {
     ready = true;
     if (state.family === undefined)
@@ -153,7 +164,34 @@ const FamilyGuide = (() => {
     chosenTowns();
     $('family-town-next').onclick = confirmTowns;
     $('family-town-search').oninput = towns;
-    $('family-school-search').oninput = schools;
+    $('family-school-search').oninput = () => {
+      schoolPage = 0;
+      schools();
+    };
+    $('family-school-prev').onclick = () => {
+      schoolPage--;
+      schools();
+    };
+    $('family-school-next').onclick = () => {
+      schoolPage++;
+      schools();
+    };
+    $('family-compare-next').onclick = compareSelected;
+    document.querySelectorAll('[data-family-weights]').forEach(
+      (b) =>
+        (b.onclick = () => {
+          change({ family: 'weights' });
+          $('family-title').focus();
+        })
+    );
+    $('family-weights-done').onclick = () => {
+      if (!SchoolEngine.normalize(state.weights)) {
+        announce('Asigna peso a al menos una materia.');
+        return;
+      }
+      change({ family: 'school' });
+      $('family-title').focus();
+    };
     $('family-advanced').onclick = () => {
       change({ family: null });
       $('heading-' + state.journey.step).focus();
@@ -189,12 +227,5 @@ const FamilyGuide = (() => {
     };
     towns();
   }
-  function alignReference() {
-    if (!ready || state.family !== 'compare' || !result.rows.length) return;
-    const candidate = state.selected[0];
-    if (!result.rows.some((r) => r.id === candidate)) return;
-    state.selected = [...new Set([candidate, result.rows[0].id])];
-    state.journey.baseline = result.rows[0].id;
-  }
-  return { initialize, refresh, alignReference };
+  return { initialize, refresh };
 })();

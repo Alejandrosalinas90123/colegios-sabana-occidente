@@ -99,10 +99,10 @@ Los identificadores dependen de la versión 2 de la base, que permanece fija en 
 Referencias de presentación: [Datawrapper: gráficos de líneas](https://academy.datawrapper.de/article/129-what-to-consider-when-creating-line-charts) y [NN/g: información progresiva](https://www.nngroup.com/articles/progressive-disclosure/).
 
 
-## Recorrido directo para familias (v8)
+## Descubrir y comparar (v9)
 
-La entrada inicial permite añadir municipios por nombre, elegir un colegio y compararlo automáticamente con el de mayor promedio entre todos los municipios elegidos. Cada municipio se confirma con su departamento para distinguir nombres repetidos. La referencia usa los mismos filtros y el mismo motor del tablero; no es el primero de cada municipio por separado.
+El recorrido principal permite añadir municipios por nombre, explorar colegios sin conocer sus nombres y elegir libremente entre dos y seis. La lista tiene ocho colegios por página, búsqueda opcional y orden según el indicador del usuario. No se añade ningún colegio de referencia automáticamente.
 
-El recorrido comienza con 2021–2025, materias y años con igual peso, jornadas diurnas y registros en todos los años. Se pueden permitir historias incompletas con una advertencia sobre comparabilidad. La elección del colegio puede ser cualquiera de los elegibles, no solo un finalista predefinido. Empates y selección del propio líder se explican. No se infieren costos ni calidad integral a partir de Saber 11.
+La importancia de las materias se puede editar desde la lista o desde la comparación. Cada materia tiene un desplegable que explica qué evalúa Saber 11. El indicador inicia con pesos iguales como convención del tablero, no como fórmula oficial del ICFES. Se conservan las selecciones al ajustar los pesos.
 
-`family-guide.js` compone este recorrido y conserva el acceso avanzado. La búsqueda al escribir filtra catálogos locales; no vuelve a descargar datos ni recalcula el ranking por cada tecla. Prueba de interacción: añadir Funza y Mosquera, elegir un colegio, generar la comparación, conservar ambos municipios y volver a la búsqueda avanzada.
+Las vistas incluyen evolución anual general, evolución de una materia, comparación de todas las materias, evaluados, diferencias y escenarios. La vista «Comparar en un solo año» permite elegir año e indicador y consultar todas las materias en una tabla desplegable. Todas usan los datos originales y el motor de cálculo existente.

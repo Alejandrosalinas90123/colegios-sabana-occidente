@@ -20,6 +20,7 @@ const ChartLab = (() => {
   const tick = (v) => fmt(v, Number.isInteger(v) ? 0 : 1);
   const panels = [
     'annual',
+    'year',
     'change',
     'scatter',
     'sensitivity',
@@ -337,6 +338,27 @@ const ChartLab = (() => {
     }
     $('lab-metric').value = options().metric;
     $('scenario-strength').value = options().strength;
+    $('comparison-year').innerHTML = lastYears
+      .map((y) => `<option value="${y}">${y}</option>`)
+      .join('');
+    $('comparison-year').value = options().year;
+    const yearRows = lastRows.map((row) => ({ row, a: row.byYear[options().year] }));
+    $('single-year-bars').innerHTML = yearRows
+      .map(
+        ({ row, a }) =>
+          `<div class="bar-row"><span>${esc(row.name)}</span><div class="bar-track" aria-hidden="true"><div class="bar-fill" style="background:${color(row.id)};width:${a ? ChartStats.value(a, options().metric) / (options().metric === 'total' ? 5 : 1) : 0}%"></div></div><strong>${a ? fmt(ChartStats.value(a, options().metric)) : 'Sin datos'}</strong></div>`
+      )
+      .join('');
+    $('single-year-table').innerHTML = table(
+      ['Colegio', ...subjects, 'Mis pesos', 'Evaluados'],
+      yearRows.map(({ row, a }) => [
+        row.name,
+        ...subjects.map((_, i) => (a ? fmt(a.scores[i]) : 'Sin datos')),
+        a ? fmt(a.score) : 'Sin datos',
+        a ? fmt(a.n, 0) : 'Sin datos',
+      ]),
+      `Resultados de ${options().year}`
+    );
     annualMean();
     changeChart();
     scatter();
@@ -354,7 +376,7 @@ const ChartLab = (() => {
       .querySelectorAll('[data-comparison-panel]')
       .forEach((el) => (el.hidden = el.dataset.comparisonPanel !== panel));
     $('compare-metric').closest('label').hidden = !['trend', 'pairs'].includes(panel);
-    $('lab-metric-control').hidden = !['change', 'scatter'].includes(panel);
+    $('lab-metric-control').hidden = !['change', 'scatter', 'year'].includes(panel);
     $('chart-scale').parentElement.querySelector('label[for="chart-scale"]').hidden = ![
       'annual',
       'change',
@@ -374,6 +396,19 @@ const ChartLab = (() => {
   function initialize() {
     ensure();
     mounted = true;
+    $('comparison-question').insertAdjacentHTML(
+      'beforeend',
+      '<option value="year">Comparar en un solo año</option>'
+    );
+    $('chart-panels').insertAdjacentHTML(
+      'beforeend',
+      '<section class="card" data-comparison-panel="year" hidden><h3>Mis colegios en un año</h3><label for="comparison-year">Año</label><select id="comparison-year"></select><div id="single-year-bars" class="ranking-chart"></div><details><summary>Ver todas las materias y evaluados</summary><div id="single-year-table" class="table-wrap"></div></details></section>'
+    );
+    $('comparison-year').onchange = (e) => {
+      options().year = Number(e.target.value);
+      render();
+      save();
+    };
     for (const [id, key] of [
       ['comparison-question', 'panel'],
       ['chart-scale', 'scale'],

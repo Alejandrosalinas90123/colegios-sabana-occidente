@@ -105,19 +105,34 @@ function contrast(a, b) {
   assert.equal($('family-school').hidden, false);
   assert.match($('family-location').textContent, /FUNZA/);
   assert.match($('family-location').textContent, /MOSQUERA/);
-  $('family-school-search').value = 'colegio';
-  $('family-school-search').dispatchEvent(new w.Event('input'));
-  const candidate = $('family-school-options').querySelector('button');
-  assert.ok(candidate);
-  candidate.click();
+  assert.ok($('family-school-options').querySelectorAll('button').length > 2);
+  const candidates = [...$('family-school-options').querySelectorAll('button')]
+    .slice(0, 3)
+    .map((b) => b.dataset.familySchool);
+  for (const id of candidates)
+    $('family-school-options').querySelector(`[data-family-school="${id}"]`).click();
+  assert.equal($('family-selected').querySelectorAll('.chip').length, 3);
+  $('family-compare-next').click();
   assert.equal($('family-compare').hidden, false);
   assert.equal($('main').hidden, false);
-  assert.match($('family-result').textContent, /promedio|puntos/);
   const familyState = JSON.parse(decodeURIComponent(w.location.hash.slice(1)));
   assert.equal(familyState.places.length, 2);
-  assert.ok(familyState.selected.length >= 1 && familyState.selected.length <= 2);
-  assert.equal(familyState.chartOptions.panel, 'annual');
-  assert.equal($('mean-chart').closest('[data-comparison-panel]').hidden, false);
+  assert.deepEqual(familyState.selected, candidates.map(Number));
+  $('comparison-question').value = 'year';
+  $('comparison-question').dispatchEvent(new w.Event('change'));
+  assert.equal($('single-year-table').querySelectorAll('tbody tr').length, 3);
+  assert.equal($('single-year-bars').closest('section').hidden, false);
+  $('comparison-year').value = '2022';
+  $('comparison-year').dispatchEvent(new w.Event('change'));
+  assert.match($('single-year-table').textContent, /2022/);
+  w.document.querySelector('#family-compare [data-family-weights]').click();
+  assert.equal($('step-priorities').hidden, false);
+  $('importance-4').value = '4';
+  $('importance-4').dispatchEvent(new w.Event('change', { bubbles: true }));
+  $('family-weights-done').click();
+  assert.equal($('family-school').hidden, false);
+  assert.equal($('weight-4').value, '40');
+  assert.equal($('family-selected').querySelectorAll('.chip').length, 3);
   $('family-advanced').click();
   $('journey-reset').click();
 
@@ -394,7 +409,7 @@ function contrast(a, b) {
     passed: true,
     domChecks: [
       'initial load',
-      'family path: two municipalities, candidate search and automatic leader comparison',
+      'discovery: two municipalities, free school selection, subject weights and single-year comparison',
       'general annual chart invariant under metric and weight changes',
       'chart point selection, year control and invalid endpoint interval',
       'weight scenario exploration and application',

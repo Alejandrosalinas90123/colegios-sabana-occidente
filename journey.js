@@ -203,7 +203,7 @@ const SchoolJourney = (() => {
         card = document.createElement('article');
       card.className = 'subject-card';
       const item = SubjectGuide.items[i];
-      card.innerHTML = `<h3>${item.name}</h3><p>${item.description}</p><label for="importance-${i}">${item.question}</label><select id="importance-${i}" data-importance="${i}"><option value="custom" disabled>Pesos personalizados</option>${SubjectGuide.labels.map((label, j) => `<option value="${j}">${label}</option>`).join('')}</select><p class="hint">O ajusta directamente el peso relativo (0–100):</p>`;
+      card.innerHTML = `<h3>${item.name}</h3><details><summary>¿Qué evalúa ${item.name}?</summary><p>${item.description}</p></details><label for="importance-${i}">${item.question}</label><select id="importance-${i}" data-importance="${i}"><option value="custom" disabled>Pesos personalizados</option>${SubjectGuide.labels.map((label, j) => `<option value="${j}">${label}</option>`).join('')}</select><p class="hint">O ajusta directamente el peso relativo (0–100):</p>`;
       label.before(card);
       card.append(label, input);
       label.querySelector('label').textContent = 'Peso de ' + item.name;

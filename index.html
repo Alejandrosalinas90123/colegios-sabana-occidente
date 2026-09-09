@@ -26,10 +26,7 @@
     <section class="intro" aria-labelledby="page-title">
       <div>
         <h1 id="page-title">Encuentra y compara colegios</h1>
-        <p>
-          Consulta los resultados Saber 11 de tu municipio y compáralos con el colegio que tienes en
-          mente.
-        </p>
+        <p>Descubre colegios de los municipios que elijas y compara sus resultados.</p>
       </div>
     </section>
     <div id="status" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -64,16 +61,31 @@
         </div>
         <div id="family-school" hidden>
           <button data-family-back="town">← Cambiar municipios</button>
-          <div id="family-leader" class="card"></div>
-          <label for="family-school-search">Nombre del colegio que estás considerando</label
+
+          <label for="family-school-search">Buscar por nombre o municipio (opcional)</label
           ><input
             id="family-school-search"
             type="search"
-            placeholder="Escribe parte del nombre"
+            placeholder="Puedes explorar la lista sin escribir"
             aria-describedby="family-school-help"
           />
           <p id="family-school-help" role="status"></p>
+          <button data-family-weights class="primary">Elegir la importancia de cada materia</button>
+          <details>
+            <summary>¿Qué significa el indicador?</summary>
+            <p>
+              Este tablero empieza con las cinco materias con igual peso. Es nuestro indicador de
+              comparación, no el puntaje global oficial del ICFES. Puedes dar más importancia a unas
+              materias y ver cómo cambia el orden.
+            </p>
+          </details>
+          <div id="family-selected" class="selection"></div>
+          <button id="family-compare-next" class="primary">Comparar elegidos</button>
           <div id="family-school-options" class="family-options"></div>
+          <div class="pagination">
+            <button id="family-school-prev">← Anteriores</button
+            ><button id="family-school-next">Más colegios →</button>
+          </div>
           <details>
             <summary>No encuentro mi colegio</summary>
             <p>Prueba una palabra del nombre. También puede faltar algún año en la base.</p>
@@ -84,9 +96,13 @@
             >
           </details>
         </div>
+        <div id="family-weights" hidden>
+          <button id="family-weights-done" class="primary">Ver colegios con estos pesos →</button>
+        </div>
         <div id="family-compare" hidden>
+          <button data-family-weights>Modificar importancia de materias</button>
           <div id="family-result"></div>
-          <button data-family-back="school">← Elegir otro colegio</button
+          <button data-family-back="school">← Cambiar mis colegios</button
           ><button data-family-back="town">Cambiar municipios</button>
         </div>
         <details>
@@ -874,15 +890,15 @@
       <div id="school-detail"></div>
     </dialog>
     <script src="engine.js?v=4"></script>
-    <script src="state.js?v=8"></script>
+    <script src="state.js?v=9"></script>
     <script src="data-loader.js?v=3"></script>
     <script src="ui.js?v=7"></script>
     <script src="subject-guide.js?v=4"></script>
     <script src="comparisons.js?v=4"></script>
-    <script src="journey.js?v=7"></script>
+    <script src="journey.js?v=9"></script>
     <script src="chart-stats.js?v=7"></script>
-    <script src="chart-lab.js?v=7"></script>
-    <script src="family-guide.js?v=8"></script>
-    <script src="app.js?v=8"></script>
+    <script src="chart-lab.js?v=9"></script>
+    <script src="family-guide.js?v=9"></script>
+    <script src="app.js?v=9"></script>
   </body>
 </html>
