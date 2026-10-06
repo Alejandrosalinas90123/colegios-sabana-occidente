@@ -37,6 +37,10 @@ const SchoolJourney = (() => {
   function departments() {
     return [...new Set(data.places.map((p) => p.department))].sort();
   }
+  function placesForDepartments(chosen) {
+    const selected = new Set(chosen);
+    return data.places.filter((p) => selected.has(p.department)).map((p) => p.id);
+  }
   function failure(step) {
     if (step === 'departments' && !state.journey.departments.length)
       return 'Selecciona al menos un departamento.';
@@ -123,7 +127,7 @@ const SchoolJourney = (() => {
     const ps = state.places.map((id) => placeMap.get(id)),
       deps = [...new Set(ps.map((p) => p.department))];
     $('journey-summary').textContent =
-      `${state.journey.departments.length} departamentos habilitados · ${ps.length} municipios incluidos en ${deps.length} departamentos · ${state.years.length} años · ${state.selected.length} colegios elegidos para comparar.${ps.length && ps.length <= 6 ? ' Municipios incluidos: ' + ps.map((p) => p.town + ' (' + p.department + ')').join(', ') + '.' : ''}`;
+      `${state.journey.departments.length} departamentos incluidos · ${ps.length} municipios incluidos en ${deps.length} departamentos · ${state.years.length} años · ${state.selected.length} colegios elegidos para comparar.${ps.length && ps.length <= 6 ? ' Municipios incluidos: ' + ps.map((p) => p.town + ' (' + p.department + ')').join(', ') + '.' : ''}`;
     $('chosen-places-title').textContent = `Ver y quitar municipios seleccionados (${ps.length})`;
     chosenPlaces();
     $('inline-places-details').querySelector('summary').textContent =
@@ -314,20 +318,35 @@ const SchoolJourney = (() => {
       picker();
       if ($('picker-next').disabled) $('picker-prev').focus();
     };
-    $('all-departments').onclick = () =>
-      change({ journey: { ...state.journey, departments: departments() } }, { controls: true });
+    $('all-departments').onclick = () => {
+      const chosen = departments();
+      change(
+        {
+          places: placesForDepartments(chosen),
+          journey: { ...state.journey, departments: chosen },
+        },
+        { controls: true }
+      );
+    };
     $('departments-list').onchange = (e) => {
       const dep = e.target.dataset.department;
       if (!dep) return;
       const chosen = e.target.checked
         ? [...new Set([...state.journey.departments, dep])]
         : state.journey.departments.filter((d) => d !== dep);
-      const places = state.places.filter((id) => chosen.includes(placeMap.get(id).department)),
-        removed = state.places.length - places.length;
+      const departmentPlaces = data.places
+        .filter((p) => p.department === dep)
+        .map((p) => p.id);
+      const places = e.target.checked
+        ? [...new Set([...state.places, ...departmentPlaces])]
+        : state.places.filter((id) => placeMap.get(id).department !== dep);
+      const changed = Math.abs(places.length - state.places.length);
       change({ places, journey: { ...state.journey, departments: chosen } }, { controls: true });
-      if (removed)
+      if (changed)
         announce(
-          `Se quitaron ${removed} municipios al desmarcar ${dep}. Revisa el resumen de selección.`
+          e.target.checked
+            ? `Se incluyeron los ${departmentPlaces.length} municipios de ${dep}.`
+            : `Se quitaron ${changed} municipios de ${dep}.`
         );
     };
     for (const [id, places] of [
