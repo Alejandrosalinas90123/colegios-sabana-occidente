@@ -30,7 +30,15 @@ const sabana = data.places
 assert.equal(sabana.length, 4);
 const state = S.defaults(sabana),
   close = (a, b) => assert.ok(Math.abs(a - b) < 1e-8, `${a} != ${b}`);
-let r = E.calculate(data, state, state.weights, state.reference);
+assert.equal(state.session, 'all');
+assert.equal(state.complete, false);
+const historicalRegionalState = { ...state, session: 'diurnal', complete: true };
+let r = E.calculate(
+  data,
+  historicalRegionalState,
+  historicalRegionalState.weights,
+  historicalRegionalState.reference
+);
 const expected = JSON.parse(fs.readFileSync(__dirname + '/tests/fixtures/regional-expected.json'));
 assert.equal(r.rows.length, 66);
 for (const e of expected) {
@@ -46,8 +54,6 @@ for (const e of expected) {
 const nationwide = {
   ...state,
   places: data.places.map((p) => p.id),
-  session: 'all',
-  complete: false,
 };
 r = E.calculate(data, nationwide, state.weights, state.reference);
 assert.equal(r.sourceCount, 72686);
