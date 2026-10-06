@@ -9,7 +9,7 @@ Tablero interactivo de resultados académicos de 2021 a 2025. Sabana de Occident
 - **Crear mi ranking:** departamentos → municipios y años → prioridades → resultados.
 - **Comparar colegios que conozco:** departamentos → municipios y años → colegios → prioridades → resultados.
 
-Un resumen visible identifica los municipios incluidos por nombre y departamento, permite buscar dentro de la selección y quitar municipios, y muestra los colegios elegidos. Seleccionar un departamento habilita sus municipios, pero no los añade automáticamente. Desmarcarlo elimina sus municipios y anuncia cuántos se quitaron. Los colegios seleccionados que dejan de cumplir los filtros se conservan señalados y no se incorporan a comparaciones incompatibles.
+Un resumen visible identifica los municipios incluidos por nombre y departamento, permite buscar dentro de la selección y quitar municipios, y muestra los colegios elegidos. Seleccionar un departamento incluye automáticamente todos sus municipios y, por tanto, todos sus colegios disponibles. Desmarcarlo elimina de la búsqueda todos los municipios de ese departamento. Los colegios seleccionados que dejan de cumplir los filtros se conservan señalados y no se incorporan a comparaciones incompatibles.
 
 Las preguntas de preferencias son orientativas, creadas para esta aplicación. Las descripciones de las materias se basan en [¿Qué se evalúa en Saber 11? del ICFES](https://www.icfes.gov.co/caja-de-herramientas-saber-11/que-se-evalua/) y en su [guía oficial](https://www.icfes.gov.co/evaluaciones-icfes/saber-11/guia-de-orientacion-examen-saber-11/), consultadas el 7 de septiembre de 2026. Se utiliza Saber 11, correspondiente a colegios, en lugar de Saber Pro, que corresponde a educación superior y tiene componentes diferentes.
 
